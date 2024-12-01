@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 import { auth, googleProvider, storage } from "../firebase/firebase.config";
 import { createUserWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { getFirestore, doc, setDoc, getDoc } from "firebase/firestore";
+import { getFirestore, doc, setDoc } from "firebase/firestore";
+import Cookies from "js-cookie";
 
 const db = getFirestore();
 
@@ -16,15 +18,14 @@ type RegisterFormInputs = {
 };
 
 const Register: React.FC = () => {
+  const navigate = useNavigate();
+  
   const { register, handleSubmit, formState: { errors } } = useForm<RegisterFormInputs>();
-  const [loading, setLoading] = useState(false);
 
   const onSubmit: SubmitHandler<RegisterFormInputs> = async (data) => {
-    setLoading(true);
     try {
       if (data.password !== data.confirmPassword) {
         alert("Passwords do not match!");
-        setLoading(false);
         return;
       }
 
@@ -38,6 +39,14 @@ const Register: React.FC = () => {
         photoURL = await getDownloadURL(storageRef);
       }
 
+      const idToken = await userCredential.user.getIdToken(true);
+
+      Cookies.set("auth_token", idToken, {
+        expires: 1, // 1 day
+        secure: true, // Only for HTTPS
+        sameSite: "strict",
+      });
+
       const userRef = doc(db, "users", userCredential.user.uid);
       await setDoc(userRef, {
         username: data.username,
@@ -46,11 +55,9 @@ const Register: React.FC = () => {
         createdAt: new Date().toISOString(),
       });
 
-      alert(`Welcome ${data.username}!`);
+      navigate("/profile");
     } catch (error: any) {
       alert(`Registration failed: ${error.message}`);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -58,20 +65,24 @@ const Register: React.FC = () => {
     try {
       const result = await signInWithPopup(auth, googleProvider);
       const user = result.user;
-  
+
+      const idToken = await user.getIdToken(true);
+
+      Cookies.set("auth_token", idToken, {
+        expires: 1, // 1 day
+        secure: true,
+        sameSite: "strict",
+      });
+
       const userRef = doc(db, "users", user.uid);
-      const userDoc = await getDoc(userRef);
-  
-      if (!userDoc.exists()) {
-        await setDoc(userRef, {
-          username: user.displayName || "NewUser",
-          email: user.email,
-          photoURL: user.photoURL || "",
-          createdAt: new Date().toISOString(),
-        });
-      }
-  
-      alert(`Welcome ${user.displayName || "User"}!`);
+      await setDoc(userRef, {
+        username: user.displayName || "NewUser",
+        email: user.email,
+        photoURL: user.photoURL || "",
+        createdAt: new Date().toISOString(),
+      });
+
+      navigate("/profile");
     } catch (error: any) {
       alert(`Google Sign-Up failed: ${error.message}`);
     }
@@ -148,10 +159,10 @@ const Register: React.FC = () => {
           </div>
           <button
             type="submit"
-            disabled={loading}
             className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring focus:ring-blue-300">
-            {loading ? "Registering..." : "Register"}
+            Register
           </button>
+
         </form>
         <div className="mt-6">
           <p className="text-center text-gray-500">Or sign up with</p>

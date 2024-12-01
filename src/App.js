@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Login from './pages/Login.tsx';
 import Register from './pages/Register.tsx';
+import Profile from './pages/Profile.tsx';
 import './App.css'
 import Navbar from './components/Navbar.tsx';
 
@@ -15,6 +16,7 @@ const App = () => {
         {/* Main Content */}
         <main className="container mx-auto px-4 py-6">
           <Routes>
+            <Route path='/profile' element={<Profile />} />
             <Route path="/signin" element={<Login />} />
             <Route path="/signup" element={<Register />} />
             <Route path="/" element={<h1 className="text-center">Welcome!</h1>} />

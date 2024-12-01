@@ -1,7 +1,9 @@
 import React from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { auth, googleProvider } from "../firebase/firebase.config"
+import { useNavigate } from "react-router-dom";
 import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import Cookies from "js-cookie";
+import { auth, googleProvider } from "../firebase/firebase.config"
 
 // Define the structure of form data
 type SignInFormInputs = {
@@ -10,6 +12,7 @@ type SignInFormInputs = {
 };
 
 const Login: React.FC = () => {
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -20,7 +23,18 @@ const Login: React.FC = () => {
   const onSubmit: SubmitHandler<SignInFormInputs> = async (data) => {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, data.email, data.password);
-      alert(`Welcome ${userCredential.user.email}!`); // change to navigate later
+      const user = userCredential.user;
+
+      // Get firebase IDToken
+      const idToken = await user.getIdToken(/* forceRefresh */ true);
+
+      Cookies.set("auth_token", idToken, {
+        expires: 1, // 1 day
+        secure: true,
+        sameSite: "strict",
+      });
+
+      navigate("/profile"); 
     } catch (error: any) {
       alert(`Login failed: ${error.message}`);
     }
@@ -30,7 +44,17 @@ const Login: React.FC = () => {
     try {
       const result = await signInWithPopup(auth, googleProvider);
       const user = result.user;
-      alert(`Welcome ${user.displayName || "User"}!`);
+
+      const idToken = await user.getIdToken(/* forceRefresh */ true);
+
+      // Store token in cookie
+      Cookies.set("auth_token", idToken, {
+        expires: 1, // 1 day
+        secure: true, // Only for HTTPS
+        sameSite: "strict",
+      });
+
+      navigate("/profile");
     } catch (error) {
       alert(`Google Sign-In failed: ${error.message}`);
     }
@@ -57,9 +81,8 @@ const Login: React.FC = () => {
                   message: "Enter a valid email address",
                 },
               })}
-              className={`mt-1 block w-full px-3 py-2 border ${
-                errors.email ? "border-red-500" : "border-gray-300"
-              } rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm`}
+              className={`mt-1 block w-full px-3 py-2 border ${errors.email ? "border-red-500" : "border-gray-300"
+                } rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm`}
             />
             {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>}
           </div>
@@ -77,9 +100,8 @@ const Login: React.FC = () => {
                   message: "Password must be at least 6 characters long",
                 },
               })}
-              className={`mt-1 block w-full px-3 py-2 border ${
-                errors.password ? "border-red-500" : "border-gray-300"
-              } rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm`}
+              className={`mt-1 block w-full px-3 py-2 border ${errors.password ? "border-red-500" : "border-gray-300"
+                } rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm`}
             />
             {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>}
           </div>
