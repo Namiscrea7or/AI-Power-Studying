@@ -1,9 +1,9 @@
 import React from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import Cookies from "js-cookie";
-import { auth, googleProvider } from "../firebase/firebase.config"
+import { auth, googleProvider } from "../firebase/firebase.config";
 
 // Define the structure of form data
 type SignInFormInputs = {
@@ -22,7 +22,11 @@ const Login: React.FC = () => {
   // Form submission handler
   const onSubmit: SubmitHandler<SignInFormInputs> = async (data) => {
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, data.email, data.password);
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        data.email,
+        data.password
+      );
       const user = userCredential.user;
 
       // Get firebase IDToken
@@ -34,7 +38,7 @@ const Login: React.FC = () => {
         sameSite: "strict",
       });
 
-      navigate("/profile"); 
+      navigate("/profile");
     } catch (error: any) {
       alert(`Login failed: ${error.message}`);
     }
@@ -68,7 +72,9 @@ const Login: React.FC = () => {
         </h2>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-700">
               Email
             </label>
             <input
@@ -81,13 +87,20 @@ const Login: React.FC = () => {
                   message: "Enter a valid email address",
                 },
               })}
-              className={`mt-1 block w-full px-3 py-2 border ${errors.email ? "border-red-500" : "border-gray-300"
-                } rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm`}
+              className={`mt-1 block w-full px-3 py-2 border ${
+                errors.email ? "border-red-500" : "border-gray-300"
+              } rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm`}
             />
-            {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>}
+            {errors.email && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.email.message}
+              </p>
+            )}
           </div>
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-gray-700">
               Password
             </label>
             <input
@@ -100,10 +113,15 @@ const Login: React.FC = () => {
                   message: "Password must be at least 6 characters long",
                 },
               })}
-              className={`mt-1 block w-full px-3 py-2 border ${errors.password ? "border-red-500" : "border-gray-300"
-                } rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm`}
+              className={`mt-1 block w-full px-3 py-2 border ${
+                errors.password ? "border-red-500" : "border-gray-300"
+              } rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm`}
             />
-            {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>}
+            {errors.password && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.password.message}
+              </p>
+            )}
           </div>
           <button
             type="submit"
