@@ -1,5 +1,7 @@
 import React from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
+import { auth, googleProvider } from "../firebase/firebase.config"
+import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 
 // Define the structure of form data
 type SignInFormInputs = {
@@ -15,12 +17,23 @@ const Login: React.FC = () => {
   } = useForm<SignInFormInputs>();
 
   // Form submission handler
-  const onSubmit: SubmitHandler<SignInFormInputs> = (data) => {
-    alert(`Sign in successful! \nEmail: ${data.email}`);
+  const onSubmit: SubmitHandler<SignInFormInputs> = async (data) => {
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, data.email, data.password);
+      alert(`Welcome ${userCredential.user.email}!`); // change to navigate later
+    } catch (error: any) {
+      alert(`Login failed: ${error.message}`);
+    }
   };
 
-  const handleOAuthSignIn = (provider: string) => {
-    alert(`Sign in with ${provider}!`);
+  const handleGoogleSignIn = async () => {
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      const user = result.user;
+      alert(`Welcome ${user.displayName || "User"}!`);
+    } catch (error) {
+      alert(`Google Sign-In failed: ${error.message}`);
+    }
   };
 
   return (
@@ -31,9 +44,7 @@ const Login: React.FC = () => {
         </h2>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-gray-700">
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
               Email
             </label>
             <input
@@ -50,16 +61,10 @@ const Login: React.FC = () => {
                 errors.email ? "border-red-500" : "border-gray-300"
               } rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm`}
             />
-            {errors.email && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.email.message}
-              </p>
-            )}
+            {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>}
           </div>
           <div>
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-gray-700">
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
               Password
             </label>
             <input
@@ -76,11 +81,7 @@ const Login: React.FC = () => {
                 errors.password ? "border-red-500" : "border-gray-300"
               } rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm`}
             />
-            {errors.password && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.password.message}
-              </p>
-            )}
+            {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>}
           </div>
           <button
             type="submit"
@@ -92,7 +93,7 @@ const Login: React.FC = () => {
           <p className="text-center text-gray-500">Or sign in with</p>
           <div className="flex justify-center space-x-4 mt-4">
             <button
-              onClick={() => handleOAuthSignIn("Google")}
+              onClick={handleGoogleSignIn}
               className="flex items-center space-x-2 px-4 py-2 border rounded-md hover:bg-gray-100 focus:outline-none">
               <img
                 src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_%22G%22_Logo.svg/512px-Google_%22G%22_Logo.svg.png"
@@ -100,16 +101,6 @@ const Login: React.FC = () => {
                 className="w-5 h-5"
               />
               <span>Google</span>
-            </button>
-            <button
-              onClick={() => handleOAuthSignIn("GitHub")}
-              className="flex items-center space-x-2 px-4 py-2 border rounded-md hover:bg-gray-100 focus:outline-none">
-              <img
-                src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
-                alt="GitHub logo"
-                className="w-5 h-5"
-              />
-              <span>GitHub</span>
             </button>
           </div>
         </div>
