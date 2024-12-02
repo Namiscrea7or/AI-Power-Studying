@@ -170,11 +170,7 @@ const Register: React.FC = () => {
             <button
               onClick={handleGoogleSignUp}
               className="flex items-center space-x-2 px-4 py-2 border rounded-md hover:bg-gray-100 focus:outline-none">
-              <img
-                src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_%22G%22_Logo.svg/512px-Google_%22G%22_Logo.svg.png"
-                alt="Google logo"
-                className="w-5 h-5"
-              />
+              <img width="48" height="48" src="https://img.icons8.com/color/48/google-logo.png" alt="google-logo"/>
               <span>Google</span>
             </button>
           </div>
