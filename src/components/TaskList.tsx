@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import TaskForm from "./TaskForm.tsx";
 import TaskItem from "./TaskItem.tsx";
+import { useTaskContext } from "./TaskContext.tsx";
 
 interface Task {
   id: number;
@@ -12,13 +13,13 @@ interface Task {
 }
 
 const TaskList: React.FC = () => {
-  const [tasks, setTasks] = useState<Task[]>([]);
   const [filter, setFilter] = useState<string>("all");
   const [sort, setSort] = useState<string>("priority");
   const [search, setSearch] = useState<string>("");
   const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const { tasks, setTasks } = useTaskContext();
 
-  const addTask = (task: Task) => {
+  const addTask = (task: Task) => { // change later
     setTasks([...tasks, { ...task, id: tasks.length + 1 }]);
   };
 
