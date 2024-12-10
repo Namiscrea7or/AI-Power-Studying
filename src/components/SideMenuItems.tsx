@@ -5,19 +5,23 @@ interface SideMenuItemProps {
   itemKey: string;
   onClick: (key: string) => void;
   active: boolean;
+  icon: any;
 }
 
-const SideMenuItem: React.FC<SideMenuItemProps> = ({ name, itemKey, onClick, active }) => {
-  const buttonClass = `block w-full text-left p-2 mb-2 rounded ${
-    active ? "bg-gray-600" : "bg-gray-700 hover:bg-gray-600"
-  }`;
-
+const SideMenuItem: React.FC<SideMenuItemProps> = ({
+  name,
+  itemKey,
+  onClick,
+  active,
+  icon,
+}) => {
   return (
     <button
-      className={buttonClass}
-      onClick={() => onClick(itemKey)}
-    >
-      {name}
+      className={`flex items-center gap-2 w-full text-left p-2 mb-2 rounded ${
+        active ? "bg-blue-100 font-semibold" : "hover:bg-blue-50"
+      }`}
+      onClick={() => onClick(itemKey)}>
+      {icon} {name}
     </button>
   );
 };
