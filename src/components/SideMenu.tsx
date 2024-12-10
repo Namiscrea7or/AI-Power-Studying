@@ -1,17 +1,19 @@
 import React, { useState } from "react";
 import SideMenuItem from "./SideMenuItems.tsx";
+import { GoHome, GoCalendar } from "react-icons/go";
 
 interface SideMenuProps {
   setActiveView: (key: string) => void;
   defaultActiveKey?: string;
 }
 
-const SideMenu: React.FC<SideMenuProps> = ({ setActiveView, defaultActiveKey = "tasks" }) => {
+const SideMenu: React.FC<SideMenuProps> = ({
+  setActiveView,
+  defaultActiveKey = "tasks",
+}) => {
   const menuItems = [
-    { name: "Task List", key: "tasks" },
-    { name: "Calendar", key: "calendar" },
-    { name: "Analytics", key: "analytics" },
-    { name: "Settings", key: "settings" },
+    { name: "Tasks", key: "tasks", icon: <GoHome /> },
+    { name: "Calendar", key: "calendar", icon: <GoCalendar /> },
   ];
 
   const [activeKey, setActiveKey] = useState<string>(defaultActiveKey);
@@ -22,9 +24,10 @@ const SideMenu: React.FC<SideMenuProps> = ({ setActiveView, defaultActiveKey = "
   };
 
   return (
-    <div className="w-64 bg-gray-800 text-white p-4">
+    <div className="fixed hidden lg:block h-dvh w-[20%] text-black p-4 border-r">
       {menuItems.map((item) => (
         <SideMenuItem
+          icon={item.icon}
           key={item.key}
           name={item.name}
           itemKey={item.key}
