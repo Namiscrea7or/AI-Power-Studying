@@ -4,7 +4,7 @@ import "react-big-calendar/lib/css/react-big-calendar.css";
 import { useTaskContext } from "./TaskContext.tsx";
 import { format, parse, startOfWeek, getDay, addHours } from "date-fns";
 import { enUS } from "date-fns/locale";
-import { DndProvider, useDrag, useDrop, DropTargetMonitor } from "react-dnd";
+import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
 interface Task {
@@ -76,7 +76,7 @@ const CalendarView: React.FC = () => {
       <div
         ref={(node) => drag(drop(node))}
         style={{
-          opacity: task.status === "Pending" ? 1 : 0,
+          //opacity: task.status === "Pending" ? 1 : 0,
           padding: "10px",
           margin: "5px 0",
           backgroundColor: "#f0f0f0",

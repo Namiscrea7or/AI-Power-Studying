@@ -34,6 +34,14 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
       estimatedTime: "1 hour",
       status: "In Progress",
     },
+    {
+      id: 3,
+      name: "gei Task",
+      description: "This is gei task",
+      priority: "High",
+      estimatedTime: "1 hour",
+      status: "Pending",
+    },
   ]);
 
   return (
