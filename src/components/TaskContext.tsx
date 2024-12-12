@@ -1,17 +1,19 @@
 import React, { createContext, useContext, useState } from "react";
 
-interface Task {
+export interface Task {
   id: number;
   name: string;
   description: string;
   priority: "High" | "Medium" | "Low";
   estimatedTime: string;
-  status: "Pending" | "In Progress" | "Completed";
+  status: "Completed" | "In Progress" | "Pending";
+  startDate?: Date;
 }
 
 interface TaskContextType {
   tasks: Task[];
   setTasks: React.Dispatch<React.SetStateAction<Task[]>>;
+  updateTaskStartDate: (taskId: number, newStartDate: Date) => void;
 }
 
 const TaskContext = createContext<TaskContextType | undefined>(undefined);
@@ -25,6 +27,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
       priority: "Medium",
       estimatedTime: "2 hours",
       status: "Pending",
+      startDate: new Date("2024-12-10T09:00:00Z"),
     },
     {
       id: 2,
@@ -33,19 +36,30 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
       priority: "High",
       estimatedTime: "1 hour",
       status: "In Progress",
+      startDate: new Date("2024-12-11T14:00:00Z"),
     },
     {
       id: 3,
-      name: "gei Task",
+      name: "Gei Task",
       description: "This is gei task",
       priority: "High",
       estimatedTime: "1 hour",
       status: "Pending",
+      startDate: new Date("2024-12-12T10:00:00Z"),
     },
   ]);
 
+  // Update the start date of the task after it is dropped
+  const updateTaskStartDate = (taskId: number, newStartDate: Date) => {
+    setTasks((prevTasks) =>
+      prevTasks.map((task) =>
+        task.id === taskId ? { ...task, startDate: newStartDate } : task
+      )
+    );
+  };
+
   return (
-    <TaskContext.Provider value={{ tasks, setTasks }}>
+    <TaskContext.Provider value={{ tasks, setTasks, updateTaskStartDate }}>
       {children}
     </TaskContext.Provider>
   );

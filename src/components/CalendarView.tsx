@@ -1,155 +1,105 @@
-import React, { useCallback, useState } from "react";
-import { Calendar, dateFnsLocalizer } from "react-big-calendar";
-import "react-big-calendar/lib/css/react-big-calendar.css";
-import { useTaskContext } from "./TaskContext.tsx";
-import { format, parse, startOfWeek, getDay, addHours } from "date-fns";
-import { enUS } from "date-fns/locale";
-import { DndProvider, useDrag, useDrop } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
+import React, { useState, useEffect } from 'react'
+import { useCalendarApp, ScheduleXCalendar } from '@schedule-x/react'
+import {
+  createViewDay,
+  createViewWeek,
+  createViewMonthGrid,
+  createViewMonthAgenda,
+} from '@schedule-x/calendar'
+import { createEventsServicePlugin } from '@schedule-x/events-service'
+import { useDrag, DndProvider } from 'react-dnd'
+import { HTML5Backend } from 'react-dnd-html5-backend'
+import { createDragAndDropPlugin } from '@schedule-x/drag-and-drop';
 
-interface Task {
-  id: number;
-  name: string;
-  description: string;
-  priority: "High" | "Medium" | "Low";
-  estimatedTime: string;
-  status: "Completed" | "In Progress" | "Pending";
-  startDate?: Date;
-}
+import '@schedule-x/theme-default/dist/index.css'
+import { useTaskContext, Task } from './TaskContext.tsx'
 
-const locales = { "en-US": enUS };
-const localizer = dateFnsLocalizer({ format, parse, startOfWeek, getDay, locales });
+const ItemType = 'TASK'
 
-const CalendarView: React.FC = () => {
-  const { tasks, setTasks } = useTaskContext();
-  const [events, setEvents] = useState<any[]>([]);
+const CalendarApp: React.FC = () => {
+  const { tasks, updateTaskStartDate } = useTaskContext()
 
-  const moveTask = useCallback((taskId: number, start: Date) => {
-    setTasks((prevTasks) =>
-      prevTasks.map((task) =>
-        task.id === taskId
-          ? { ...task, status: start < new Date() ? "Completed" : "In Progress", startDate: start }
-          : task
-      )
-    );
-  }, [setTasks]);
+  const eventsService = useState(() => createEventsServicePlugin())[0]
 
-  const handleDrop = useCallback((item: any, start: Date) => {
-    if (!('taskId' in item)) {
-      moveTask(item.id, start);
+  const calendar = useCalendarApp({
+    views: [
+      createViewDay(),
+      createViewWeek(),
+      createViewMonthGrid(),
+      createViewMonthAgenda(),
+    ],
+    events: tasks.map(task => ({
+      id: task.id.toString(),
+      title: task.name,
+      start: task.startDate ? task.startDate.toISOString().split('T')[0] : "",
+      end: task.startDate ? new Date(task.startDate.getTime() + 60 * 60 * 1000).toISOString().split('T')[0] : "",
+    })),
+    plugins: [
+      eventsService,
+      createDragAndDropPlugin()
+    ],
+  })
 
-      setEvents((prevEvents) => {
-        const newEvent = {
-          title: `${item.name} (${item.priority})`,
-          start,
-          end: addHours(start, 1),
-          taskId: item.id,
-        };
-        return [...prevEvents, newEvent];
-      });
-    } else {
-      setEvents((prevEvents) =>
-        prevEvents.map((e) =>
-          e.taskId === item.taskId ? { ...e, start, end: addHours(start, 1) } : e
-        )
-      );
-    }
-  }, [moveTask]);
+  useEffect(() => {
+    eventsService.getAll()
+  }, [eventsService])
 
-  const handleMoveTaskBackToList = useCallback((taskId: number) => {
-    setEvents((prevEvents) => prevEvents.filter((event) => event.taskId !== taskId));
-    setTasks((prevTasks) =>
-      prevTasks.map((task) =>
-        task.id === taskId ? { ...task, status: "Pending", startDate: undefined } : task
-      )
-    );
-  }, [setTasks]);
-
-  const TaskItem = React.memo(({ task }: { task: Task }) => {
-    const [, drag] = useDrag(() => ({ type: "TASK", item: task }));
-    const [, drop] = useDrop(() => ({
-      accept: "TASK",
-      drop: (item: any) => handleMoveTaskBackToList(item.taskId),
-    }));
-
-    return (
-      <div
-        ref={(node) => drag(drop(node))}
-        style={{
-          //opacity: task.status === "Pending" ? 1 : 0,
-          padding: "10px",
-          margin: "5px 0",
-          backgroundColor: "#f0f0f0",
-          border: "1px solid #ccc",
-          borderRadius: "4px",
-          cursor: "move",
-        }}
-      >
-        {task.name} ({task.priority})
-      </div>
-    );
-  });
-
-  const DateCellWrapper: React.FC<{ value: Date; children?: React.ReactNode }> = ({ value, children }) => {
-    const [, drop] = useDrop<any, any>(() => ({
-      accept: "TASK",
-      drop: (item) => handleDrop(item, value),
-      collect: monitor => ({
-        isOver: !!monitor.isOver()
-      })
-    }));
-
-    return <div ref={drop} style={{ width: "100%", height: "100%", border: '1px solid gray' }}>{children}</div>;
-  };
-
-  const Event: React.FC<{ event: any }> = ({ event }) => {
-    const [, drag] = useDrag(() => ({ type: "TASK", item: event }));
-    const { tasks } = useTaskContext();
-    const task = tasks.find((t) => t.id === event.taskId);
-
-    if (!task) {
-      return null; 
-    }
-
-    return (
-      <div
-        ref={drag}
-        style={{
-          padding: "5px",
-          backgroundColor: "#B0E0E6",
-          borderRadius: "4px",
-          cursor: "move",
-        }}
-      >
-        {task.name} ({task.priority})
-      </div>
-    );
+  const handleEventUpdate = (event: any) => {
+    const taskID = Number(event.id);
+    const newStartDate = new Date(event.start);
+    updateTaskStartDate(taskID, newStartDate);
   };
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <div style={{ display: "flex" }}>
-        <div style={{ width: "300px", marginRight: "20px" }}>
-          <h3>Task List</h3>
+      <div className="flex">
+        <div className="w-72 p-4">
+          <h2 className="text-xl font-bold mb-4">Tasks</h2>
           {tasks.map((task) => (
-            <TaskItem key={task.id} task={task} />
+            <div key={task.id}>
+              <TaskItem task={task} />
+            </div>
           ))}
         </div>
 
-        <div style={{ flexGrow: 1 }}>
-          <Calendar
-            localizer={localizer}
-            events={events}
-            startAccessor="start"
-            endAccessor="end"
-            style={{ height: 500, margin: "20px" }}
-            components={{ dateCellWrapper: DateCellWrapper, event: Event }}
-            draggableAccessor={() => true}
+        <div className="flex-1 p-4">
+          <h1 className="text-2xl font-bold mb-4">ScheduleX Calendar</h1>
+          <ScheduleXCalendar
+            calendarApp={calendar}
+            onEventUpdate={handleEventUpdate}
           />
         </div>
       </div>
     </DndProvider>
-  );
-};
+  )
+}
 
-export default CalendarView;
+interface TaskItemProps {
+  task: Task;
+}
+
+const TaskItem: React.FC<TaskItemProps> = ({ task }) => {
+  const [{ isDragging }, drag] = useDrag({
+    type: ItemType,
+    item: { task },
+    collect: (monitor) => ({
+      isDragging: monitor.isDragging(),
+    }),
+  })
+
+  return (
+    <div
+      ref={drag}
+      className={`mb-2 p-2 border border-gray-400 rounded ${isDragging ? 'bg-green-200' : 'bg-white'} cursor-move`}
+    >
+      <h3 className="font-semibold">{task.name}</h3>
+      <p>{task.description}</p>
+      <p>Status: {task.status}</p>
+      <p>Priority: {task.priority}</p>
+      <p>Estimated Time: {task.estimatedTime}</p>
+      {task.startDate && <p>Start Date: {task.startDate.toString()}</p>}
+    </div>
+  )
+}
+
+export default CalendarApp
