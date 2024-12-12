@@ -1,20 +1,19 @@
 import React, { createContext, useContext, useState } from "react";
-import { formatISO } from 'date-fns';
 
 export interface Task {
   id: number;
-  name: string;
+  title: string;
   description: string;
   priority: "High" | "Medium" | "Low";
   estimatedTime: string;
   status: "Completed" | "In Progress" | "Pending";
-  startDate?: string; // Kiểu dữ liệu là string
+  start: string;
+  end: string;
 }
 
 interface TaskContextType {
   tasks: Task[];
   setTasks: React.Dispatch<React.SetStateAction<Task[]>>;
-  updateTaskStartDate: (taskId: number, newStartDate: Date) => void;
 }
 
 const TaskContext = createContext<TaskContextType | undefined>(undefined);
@@ -23,46 +22,38 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [tasks, setTasks] = useState<Task[]>([
     {
       id: 1,
-      name: "Sample Task",
-      description: "This is a sample task",
+      title: "HEHE",
+      description: "hehe",
       priority: "Medium",
       estimatedTime: "2 hours",
       status: "Pending",
-      startDate: '2024-12-10', // Sử dụng YYYY-MM-DD
+      start: "2024-12-11 09:00",
+      end: "2024-12-11 15:00",
     },
     {
       id: 2,
-      name: "Another Task",
-      description: "This is another task",
+      title: "Task 2",
+      description: "t2",
       priority: "High",
-      estimatedTime: "1 hour",
-      status: "In Progress",
-      startDate: '2024-12-11', // Sử dụng YYYY-MM-DD
+      estimatedTime: "3 hours",
+      status: "Pending",
+      start: "2024-12-13 08:00",
+      end: "2024-12-14 15:00",
     },
     {
       id: 3,
-      name: "Gei Task",
-      description: "This is gei task",
+      title: "High Task",
+      description: "high vl",
       priority: "High",
-      estimatedTime: "1 hour",
+      estimatedTime: "3 hours",
       status: "Pending",
-      startDate: '2024-12-12', // Sử dụng YYYY-MM-DD
+      start: "2024-12-11 08:00",
+      end: "2024-12-11 20:00",
     },
   ]);
 
-  // Update the start date of the task after it is dropped
-  const updateTaskStartDate = (taskId: number, newStartDate: Date) => {
-    setTasks((prevTasks) =>
-      prevTasks.map((task) =>
-        task.id === taskId
-          ? { ...task, startDate: formatISO(newStartDate, { representation: 'date' }) }
-          : task
-      )
-    );
-  };
-
   return (
-    <TaskContext.Provider value={{ tasks, setTasks, updateTaskStartDate }}>
+    <TaskContext.Provider value={{ tasks, setTasks }}>
       {children}
     </TaskContext.Provider>
   );

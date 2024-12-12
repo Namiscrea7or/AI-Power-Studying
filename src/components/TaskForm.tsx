@@ -3,7 +3,7 @@ import React, { useState } from "react";
 interface TaskFormProps {
   task?: {
     id?: number;
-    name: string;
+    title: string;
     description: string;
     priority: string;
     estimatedTime: string;
@@ -14,7 +14,7 @@ interface TaskFormProps {
 }
 
 const TaskForm: React.FC<TaskFormProps> = ({ task, onSave, onCancel }) => {
-  const [name, setName] = useState(task?.name || "");
+  const [name, setName] = useState(task?.title || "");
   const [description, setDescription] = useState(task?.description || "");
   const [priority, setPriority] = useState(task?.priority || "Medium");
   const [estimatedTime, setEstimatedTime] = useState(task?.estimatedTime || "");

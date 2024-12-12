@@ -1,16 +1,9 @@
 import React, { useState } from "react";
 import TaskForm from "./TaskForm.tsx";
 import TaskItem from "./TaskItem.tsx";
-import { useTaskContext } from "./TaskContext.tsx";
+import { Task, useTaskContext } from "./TaskContext.tsx";
 
-interface Task {
-  id: number;
-  name: string;
-  description: string;
-  priority: "High" | "Medium" | "Low";
-  estimatedTime: string;
-  status: "Pending" | "In Progress" | "Completed";
-}
+
 
 const TaskList: React.FC = () => {
   const [filter, setFilter] = useState<string>("all");
@@ -19,7 +12,7 @@ const TaskList: React.FC = () => {
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const { tasks, setTasks } = useTaskContext();
 
-  const addTask = (task: Task) => { // change later
+  const addTask = (task: Task) => {
     setTasks([...tasks, { ...task, id: tasks.length + 1 }]);
   };
 
@@ -34,8 +27,14 @@ const TaskList: React.FC = () => {
 
   const filteredTasks = tasks
     .filter((task) => (filter === "all" ? true : task.status === filter))
-    .filter((task) => task.name.toLowerCase().includes(search.toLowerCase()))
-    .sort((a, b) => (sort === "priority" ? b.priority.localeCompare(a.priority) : 0));
+    .filter((task) => task.title.toLowerCase().includes(search.toLowerCase()))
+    .sort((a, b) => {
+      if (sort === "priority") {
+        const priorityOrder = { High: 3, Medium: 2, Low: 1 };
+        return priorityOrder[b.priority] - priorityOrder[a.priority];
+      }
+      return 0;
+    });
 
   return (
     <div className="p-4">
