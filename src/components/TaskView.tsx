@@ -25,7 +25,7 @@ const Header = ({ setSort, setFilter, setSearch }) => {
     },
     {
       title: "Name",
-      compareFn: () => (a: Task, b: Task) => a.name.localeCompare(b.name),
+      compareFn: () => (a: Task, b: Task) => a.title.localeCompare(b.title),
     },
     {
       title: "Time",
@@ -174,7 +174,7 @@ const TaskView = () => {
         (t) =>
           t.status === status &&
           (!filterOption || t.priority === filterOption) &&
-          (!search || t.name.toLowerCase().includes(search.toLowerCase()))
+          (!search || t.title.toLowerCase().includes(search.toLowerCase()))
       )
       .sort(sortOption || (() => 0));
 

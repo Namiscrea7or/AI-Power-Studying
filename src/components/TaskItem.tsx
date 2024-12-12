@@ -3,7 +3,7 @@ import React from "react";
 interface TaskItemProps {
   task: {
     id: number;
-    name: string;
+    title: string;
     description: string;
     priority: string;
     estimatedTime: string;
@@ -17,7 +17,7 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, onEdit, onDelete }) => {
   return (
     <li className="flex justify-between items-center bg-white p-4 border rounded mb-2">
       <div>
-        <h3 className="font-bold">{task.name}</h3>
+        <h3 className="font-bold">{task.title}</h3>
         <p>{task.description}</p>
         <p>
           Priority: {task.priority}, Status: {task.status}
