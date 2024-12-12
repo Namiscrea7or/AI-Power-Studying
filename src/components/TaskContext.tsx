@@ -5,7 +5,7 @@ interface Task {
   name: string;
   description: string;
   priority: "High" | "Medium" | "Low";
-  estimatedTime: string;
+  estimatedTime: number;
   status: "Pending" | "In Progress" | "Completed";
 }
 
@@ -16,14 +16,16 @@ interface TaskContextType {
 
 const TaskContext = createContext<TaskContextType | undefined>(undefined);
 
-export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+const TaskProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [tasks, setTasks] = useState<Task[]>([
     {
       id: 1,
       name: "Sample Task",
       description: "This is a sample task",
       priority: "Medium",
-      estimatedTime: "2 hours",
+      estimatedTime: 2,
       status: "Pending",
     },
     {
@@ -31,7 +33,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
       name: "Another Task",
       description: "This is another task",
       priority: "High",
-      estimatedTime: "1 hour",
+      estimatedTime: 1,
       status: "In Progress",
     },
   ]);
@@ -43,8 +45,11 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
   );
 };
 
-export const useTaskContext = () => {
+const useTaskContext = () => {
   const context = useContext(TaskContext);
-  if (!context) throw new Error("useTaskContext must be used within a TaskProvider");
+  if (!context)
+    throw new Error("useTaskContext must be used within a TaskProvider");
   return context;
 };
+
+export { TaskProvider, useTaskContext, Task };

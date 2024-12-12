@@ -1,11 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import { cn } from "../utils/cn.tsx";
 import { GoPlus } from "react-icons/go";
 import TaskCard from "./TaskCard.tsx";
+import { Task, useTaskContext } from "./TaskContext.tsx";
+import TaskInputForm from "./TaskInputForm.tsx";
 
 type TaskColumnProps = {
   title: string;
-  tasks: any;
+  tasks: Task[];
   color: Color;
   onAddTask?: () => void;
 };
@@ -37,6 +39,17 @@ const TaskColumn: React.FC<TaskColumnProps> = ({
   color,
   onAddTask,
 }) => {
+  const [currentTask, setCurrentTask] = useState<Task | undefined>(undefined);
+  const { setTasks } = useTaskContext();
+  const editTask = (task: any) => {
+    setTasks((prevTasks) =>
+      prevTasks.map((t) =>
+        t.id === task.id ? { id: t.id, status: t.status, ...task } : t
+      )
+    );
+
+    setCurrentTask(undefined);
+  };
   return (
     <div className="lg:flex-shrink-1 w-full lg:w-1/3 p-4 bg-[#f5f5f5] rounded-lg">
       <div className="w-full flex items-center mb-1">
@@ -55,9 +68,21 @@ const TaskColumn: React.FC<TaskColumnProps> = ({
         )}
       </div>
       <div className={cn(`mb-4 border`, colors[color].border)} />
+      {tasks.length === 0}
       {tasks.map((task) => (
-        <TaskCard key={task.id} task={task} />
+        <TaskCard
+          onClick={() => setCurrentTask(task)}
+          key={task.id}
+          task={task}
+        />
       ))}
+      {currentTask && (
+        <TaskInputForm
+          task={currentTask}
+          onSubmit={editTask}
+          onCancel={() => setCurrentTask(undefined)}
+        />
+      )}
     </div>
   );
 };
