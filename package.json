@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@fontsource/inter": "^5.1.0",
+    "@schedule-x/calendar": "^2.11.0",
     "@schedule-x/drag-and-drop": "^2.11.0",
     "@schedule-x/events-service": "^2.11.0",
     "@schedule-x/react": "^2.10.0",

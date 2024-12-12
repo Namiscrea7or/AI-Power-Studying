@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState } from "react";
+import { formatISO } from 'date-fns';
 
 export interface Task {
   id: number;
@@ -7,7 +8,7 @@ export interface Task {
   priority: "High" | "Medium" | "Low";
   estimatedTime: string;
   status: "Completed" | "In Progress" | "Pending";
-  startDate?: Date;
+  startDate?: string; // Kiểu dữ liệu là string
 }
 
 interface TaskContextType {
@@ -27,7 +28,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
       priority: "Medium",
       estimatedTime: "2 hours",
       status: "Pending",
-      startDate: new Date("2024-12-10T09:00:00Z"),
+      startDate: '2024-12-10', // Sử dụng YYYY-MM-DD
     },
     {
       id: 2,
@@ -36,7 +37,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
       priority: "High",
       estimatedTime: "1 hour",
       status: "In Progress",
-      startDate: new Date("2024-12-11T14:00:00Z"),
+      startDate: '2024-12-11', // Sử dụng YYYY-MM-DD
     },
     {
       id: 3,
@@ -45,7 +46,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
       priority: "High",
       estimatedTime: "1 hour",
       status: "Pending",
-      startDate: new Date("2024-12-12T10:00:00Z"),
+      startDate: '2024-12-12', // Sử dụng YYYY-MM-DD
     },
   ]);
 
@@ -53,7 +54,9 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const updateTaskStartDate = (taskId: number, newStartDate: Date) => {
     setTasks((prevTasks) =>
       prevTasks.map((task) =>
-        task.id === taskId ? { ...task, startDate: newStartDate } : task
+        task.id === taskId
+          ? { ...task, startDate: formatISO(newStartDate, { representation: 'date' }) }
+          : task
       )
     );
   };
