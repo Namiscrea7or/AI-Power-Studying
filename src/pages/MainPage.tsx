@@ -1,16 +1,15 @@
 import React from "react";
 import { useState } from "react";
-import SideMenu from "../components/SideMenu.tsx";
-import TaskList from "../components/TaskList.tsx";
-import CalendarView from "../components/CalendarView.tsx";
-import TaskView from "../components/TaskView.tsx";
-import { TaskProvider } from "../components/TaskContext.tsx";
+import SideMenu from "../components/Navigation/SideMenu.tsx";
+import CalendarView from "../components/Calendar/CalendarView.tsx";
+import TaskView from "../components/TaskView/TaskView.tsx";
+import { TaskProvider } from "../Context/TaskContext.tsx";
 
 const MainPage: React.FC = () => {
   const [activeView, setActiveView] = useState<string>("tasks");
 
   const views: { [key: string]: JSX.Element } = {
-    tasks: <TaskList />,
+    tasks: <TaskView />,
     calendar: <CalendarView />,
     // analytics: <Analytics />,
     // settings: <Settings />,

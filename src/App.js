@@ -6,7 +6,7 @@ import Profile from './pages/Profile.tsx';
 import MainPage from './pages/MainPage.tsx';
 import './App.css'
 import "@fontsource/inter";
-import Navbar from './components/Navbar.tsx';
+import Navbar from './components/Navigation/Navbar.tsx';
 
 const App = () => {
   return (

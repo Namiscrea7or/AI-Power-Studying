@@ -1,7 +1,7 @@
 import React from "react";
 import { cn } from "../utils/cn.tsx";
 import { GoPlus } from "react-icons/go";
-import TaskCard from "./TaskCard.tsx";
+import TaskCard from "./Tasks/TaskCard.tsx";
 
 type TaskColumnProps = {
   title: string;

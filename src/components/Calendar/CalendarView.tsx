@@ -6,10 +6,13 @@ import { createEventModalPlugin } from "@schedule-x/event-modal";
 import { createDragAndDropPlugin } from "@schedule-x/drag-and-drop";
 import "@schedule-x/theme-default/dist/calendar.css";
 
-import { useTaskContext } from "./TaskContext.tsx";
+import { useTaskContext } from "../../Context/TaskContext.tsx";
 
 const CalendarView = () => {
   const { tasks } = useTaskContext();
+
+  const today = new Date();
+  const todayString = today.toISOString().split('T')[0];
 
   const calendar: CalendarApp = useCalendarApp({
     views: [
@@ -17,7 +20,7 @@ const CalendarView = () => {
       createViewMonthGrid(),
     ],
     events: tasks,
-    selectedDate: "2024-12-11 00:00",
+    selectedDate: todayString,
     plugins: [
       createEventModalPlugin(),
       createDragAndDropPlugin(),

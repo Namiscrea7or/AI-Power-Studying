@@ -2,68 +2,8 @@ import React, { useState } from "react";
 import { CiFilter } from "react-icons/ci";
 import { IoIosArrowDown } from "react-icons/io";
 import { MdOutlineSort } from "react-icons/md";
-import { TaskColumn, Color } from "./TaskColumn.tsx";
-
-const tasks = {
-  todo: [
-    {
-      id: 1,
-      title: "Brainstorming",
-      priority: "Low",
-      description:
-        "Brainstorming brings team members' diverse experience into play.",
-      due: "12/12/2024",
-    },
-    {
-      id: 2,
-      title: "Research",
-      priority: "High",
-      description:
-        "User research helps you to create an optimal product for users.",
-      due: "12/12/2024",
-    },
-    {
-      id: 2,
-      title: "Research",
-      priority: "High",
-      description:
-        "User research helps you to create an optimal product for users.",
-      due: "12/12/2024",
-    },
-    {
-      id: 2,
-      title: "Research",
-      priority: "High",
-      description:
-        "User research helps you to create an optimal product for users.",
-      due: "12/12/2024",
-    },
-  ],
-  onProgress: [
-    {
-      id: 4,
-      title: "Onboarding Illustrations",
-      priority: "Low",
-      description: "Creating illustrations for onboarding screens.",
-      due: "12/12/2024",
-    },
-    {
-      id: 5,
-      title: "Moodboard",
-      priority: "Low",
-      description: "Curating moodboard to align visual elements.",
-      due: "12/12/2024",
-    },
-  ],
-  done: [
-    {
-      id: 6,
-      title: "Mobile App Design",
-      status: "Completed",
-      due: "12/12/2024",
-    },
-  ],
-};
+import { TaskColumn, Color } from "../Tasks/TaskColumn";
+import { useTaskContext } from "../../Context/TaskContext";
 
 const TaskInputForm = ({ onSubmit, onCancel }) => {
   const [title, setTitle] = useState("");
@@ -233,6 +173,7 @@ const Header = () => {
 };
 
 const TaskView = () => {
+  const {tasks, setTasks} = useTaskContext()
   const [tasksData, setTasksData] = useState(tasks);
   const [isAddingTask, setIsAddingTask] = useState(false);
 
@@ -258,7 +199,7 @@ const TaskView = () => {
       <div className="flex gap-4 lg:flex-row lg:items-start flex-col">
         <TaskColumn
           title="To Do"
-          tasks={tasksData.todo}
+          tasks={tasksData.pending}
           color={Color.Blue}
           onAddTask={() => setIsAddingTask(true)}
         />
