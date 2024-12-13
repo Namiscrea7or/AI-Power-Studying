@@ -11,13 +11,15 @@ const TaskInputForm: React.FC<TaskInputFormProps> = ({
   onSubmit,
   onCancel,
 }) => {
-  const [name, setName] = useState(task?.name ?? "");
+  const [title, setTitle] = useState(task?.title ?? "");
   const [priority, setPriority] = useState(task?.priority ?? "Low");
   const [description, setDescription] = useState(task?.description ?? "");
   const [estimatedTime, setEstimatedTime] = useState(task?.estimatedTime ?? "");
+  const [start, setStart] = useState(task?.start ?? "");
+  const [status, setStatus] = useState(task?.status ?? "");
 
   const clearForm = () => {
-    setName("");
+    setTitle("");
     setDescription("");
     setEstimatedTime("");
     setPriority("Low");
@@ -30,14 +32,16 @@ const TaskInputForm: React.FC<TaskInputFormProps> = ({
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!name) return;
+    if (!title) return;
 
     const newTask = {
       id: task?.id ?? undefined,
-      name,
+      title,
       priority,
       description,
       estimatedTime,
+      start,
+      status,
     };
 
     clearForm();
@@ -56,21 +60,10 @@ const TaskInputForm: React.FC<TaskInputFormProps> = ({
             <input
               type="text"
               className="w-full px-3 py-2 border rounded"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
               required
             />
-          </div>
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-2">Priority</label>
-            <select
-              className="w-full px-3 py-2 border rounded"
-              value={priority}
-              onChange={(e) => setPriority(e.target.value)}>
-              <option value="Low">Low</option>
-              <option value="Medium">Medium</option>
-              <option value="High">High</option>
-            </select>
           </div>
           <div className="mb-4">
             <label className="block text-sm font-medium mb-2">
@@ -95,6 +88,42 @@ const TaskInputForm: React.FC<TaskInputFormProps> = ({
               onChange={(e) => setEstimatedTime(e.target.value)}
               required
             />
+          </div>
+          <div className="mb-4">
+            <label className="block text-sm font-medium mb-2">Start Date</label>
+            <input
+              value={start.replace(" ", "T")}
+              type="datetime-local"
+              className="w-full px-3 py-2 border rounded"
+              onChange={(e) => {
+                setStart(e.target.value.replace("T", " "));
+              }}
+              required
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <div className="mb-4">
+              <label className="block text-sm font-medium mb-2">Priority</label>
+              <select
+                className="w-full px-3 py-2 border rounded"
+                value={priority}
+                onChange={(e) => setPriority(e.target.value)}>
+                <option value="Low">Low</option>
+                <option value="Medium">Medium</option>
+                <option value="High">High</option>
+              </select>
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-medium mb-2">Status</label>
+              <select
+                className="w-full px-3 py-2 border rounded"
+                value={status}
+                onChange={(e) => setStatus(e.target.value)}>
+                <option value="Pending">To Do</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Completed">Completed</option>
+              </select>
+            </div>
           </div>
           <div className="flex justify-between">
             <button
