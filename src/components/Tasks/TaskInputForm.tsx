@@ -165,8 +165,4 @@ const TaskInputForm: React.FC<TaskInputFormProps> = ({
   );
 };
 
-<<<<<<< HEAD
 export default TaskInputForm;
-=======
-export default TaskInputForm;
->>>>>>> 4c96566e088428a8723eafe1a4e449979fef544d
