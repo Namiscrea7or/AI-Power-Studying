@@ -2,11 +2,15 @@ import React, { useState } from "react";
 import { CiFilter } from "react-icons/ci";
 import { IoIosArrowDown, IoIosClose } from "react-icons/io";
 import { MdOutlineSort } from "react-icons/md";
-import { TaskColumn, Color } from "./TaskColumn.tsx";
-import { useTaskContext, Task } from "./TaskContext.tsx";
-import TaskInputForm from "./TaskInputForm.tsx";
+import { TaskColumn, Color } from "../Tasks/TaskColumn.tsx";
+import {
+  useTaskContext,
+  Task,
+  TaskStatus,
+} from "../../Context/TaskContext.tsx";
+import TaskInputForm from "../Tasks/TaskInputForm.tsx";
 
-const Header = ({ setSort, setFilter, setSearch }) => {
+const Header = ({ setIsAddingTask, setSort, setFilter, setSearch }) => {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isSortOpen, setIsSortOpen] = useState(false);
   const [isFilterOrSort, setIsFilterOrSort] = useState(false);
@@ -28,8 +32,8 @@ const Header = ({ setSort, setFilter, setSearch }) => {
       compareFn: () => (a: Task, b: Task) => a.title.localeCompare(b.title),
     },
     {
-      title: "Time",
-      compareFn: () => (a: Task, b: Task) => a.estimatedTime - b.estimatedTime,
+      title: "Due",
+      compareFn: () => (a: Task, b: Task) => a.end > b.end,
     },
   ];
 
@@ -60,7 +64,19 @@ const Header = ({ setSort, setFilter, setSearch }) => {
 
   return (
     <div className="flex flex-col mb-6 w-full">
-      <h1 className="text-4xl font-bold mb-6">My Tasks</h1>
+      <div className="mb-6">
+        <h1 className="text-4xl font-bold">My Tasks</h1>
+        <p className="text-gray-500 mt-2">
+          Easily create, edit, and delete tasks with just a few clicks.{" "}
+          <span>
+            <button
+              onClick={setIsAddingTask}
+              className="text-blue-500 underline">
+              Create a task
+            </button>
+          </span>
+        </p>
+      </div>
       <div className="gap-2 grid grid-rows-2 sm:flex sm:flex-row sm:justify-between">
         <div className="flex gap-2">
           <div className="flex items-center space-x-4 relative">
@@ -159,8 +175,10 @@ const TaskView = () => {
   >(undefined);
 
   const addTask = (task: Task) => {
-    setTasks([...tasks, { ...task, id: tasks.length + 1, status: "Pending" }]);
-    console.log(tasks);
+    setTasks([
+      ...tasks,
+      { ...task, id: task.id === -1 ? tasks.length + 1 : task.id },
+    ]);
     setIsAddingTask(false);
   };
 
@@ -168,7 +186,7 @@ const TaskView = () => {
     setIsAddingTask(false);
   };
 
-  const sortedTasks = (status: string) => {
+  const sortedTasks = (status: TaskStatus) => {
     const filteredTasks = tasks
       .filter(
         (t) =>
@@ -184,6 +202,7 @@ const TaskView = () => {
   return (
     <div>
       <Header
+        setIsAddingTask={() => setIsAddingTask(true)}
         setSearch={setSearch}
         setSort={setSortOption}
         setFilter={setFilterOption}
@@ -194,18 +213,18 @@ const TaskView = () => {
       <div className="flex gap-4 lg:flex-row lg:items-start flex-col">
         <TaskColumn
           title="To Do"
-          tasks={sortedTasks("Pending")}
+          tasks={sortedTasks(TaskStatus.Pending)}
           color={Color.Blue}
           onAddTask={() => setIsAddingTask(true)}
         />
         <TaskColumn
           title="On Progress"
-          tasks={sortedTasks("In Progress")}
+          tasks={sortedTasks(TaskStatus["OnGoing"])}
           color={Color.Orange}
         />
         <TaskColumn
           title="Done"
-          tasks={sortedTasks("Completed")}
+          tasks={sortedTasks(TaskStatus.Completed)}
           color={Color.Green}
         />
       </div>
