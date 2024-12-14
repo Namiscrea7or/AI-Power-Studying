@@ -1,7 +1,17 @@
+<<<<<<< HEAD
 import React from "react";
 import { cn } from "../../utils/cn.tsx";
 import { GoPlus } from "react-icons/go";
 import TaskCard from "./TaskCard.tsx";
+=======
+import React, { useState } from "react";
+import { cn } from "../../utils/cn.tsx";
+import { GoPlus } from "react-icons/go";
+import TaskCard from "./TaskCard.tsx";
+import { Task, useTaskContext } from "../../Context/TaskContext.tsx";
+import TaskInputForm from "./TaskInputForm.tsx";
+
+>>>>>>> 4c96566e088428a8723eafe1a4e449979fef544d
 type TaskColumnProps = {
   title: string;
   tasks: any;
