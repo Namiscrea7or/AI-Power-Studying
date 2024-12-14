@@ -1,5 +1,9 @@
 import React from "react";
-import { Task, useTaskContext } from "../TaskContext.tsx";
+import {
+  Task,
+  TaskPriority,
+  useTaskContext,
+} from "../../Context/TaskContext.tsx";
 import { AiOutlineDelete } from "react-icons/ai";
 
 interface TaskCardProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -28,25 +32,28 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, ...props }) => {
     <div {...props} className="bg-white shadow rounded-lg p-4 mb-4">
       <div className="flex justify-between items-center">
         <h4 className="text-lg font-semibold">{task.title}</h4>
-        {task.priority && (
-          <span
-            className={`text-sm px-2 py-1 rounded ${
-              taskPriority[task.priority]
-            }`}>
-            {task.priority}
-          </span>
-        )}
+        <span
+          className={`text-sm px-2 py-1 rounded ${
+            taskPriority[TaskPriority[task.priority]]
+          }`}>
+          {TaskPriority[task.priority]}
+        </span>
       </div>
-      <p className="text-sm text-gray-600 mt-2">{task.description}</p>
+      <hr className="my-2" />
+      <p className="text-sm text-gray-600">
+        <b>Start:</b> {task.start.toLocaleString()}
+      </p>
+      <p className="text-sm text-gray-600 my-2">
+        <b>Description: </b>
+        {task.description}
+      </p>
       <div className="flex justify-between items-center mt-4 text-sm text-gray-500">
-        <div>Estimated time: {task.estimatedTime}</div>
-        <div className="flex">
-          <button
-            onClick={handleDeleteClick}
-            className="text-red-500 bg-red-100 hover:bg-red-300 p-1 rounded">
-            <AiOutlineDelete />
-          </button>
-        </div>
+        <div>Due: {task.end.toLocaleString()}</div>
+        <button
+          onClick={handleDeleteClick}
+          className="text-red-500 bg-red-100 hover:bg-red-300 p-1 rounded">
+          <AiOutlineDelete />
+        </button>
       </div>
     </div>
   );

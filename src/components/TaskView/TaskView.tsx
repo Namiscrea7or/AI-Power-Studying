@@ -1,99 +1,56 @@
 import React, { useState } from "react";
 import { CiFilter } from "react-icons/ci";
-import { IoIosArrowDown } from "react-icons/io";
+import { IoIosArrowDown, IoIosClose } from "react-icons/io";
 import { MdOutlineSort } from "react-icons/md";
-import { TaskColumn, Color } from "../Tasks/TaskColumn";
-import { useTaskContext } from "../../Context/TaskContext";
+import { TaskColumn, Color } from "../Tasks/TaskColumn.tsx";
+import {
+  useTaskContext,
+  Task,
+  TaskStatus,
+} from "../../Context/TaskContext.tsx";
+import TaskInputForm from "../Tasks/TaskInputForm.tsx";
 
-const TaskInputForm = ({ onSubmit, onCancel }) => {
-  const [title, setTitle] = useState("");
-  const [priority, setPriority] = useState("Low");
-  const [description, setDescription] = useState("");
-  const [due, setDue] = useState("");
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (title && description && due) {
-      const newTask = {
-        id: Date.now(),
-        title,
-        priority,
-        description,
-        due,
-      };
-      onSubmit(newTask);
-    }
-  };
-
-  return (
-    <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
-      <div className="bg-white p-6 rounded shadow-lg w-1/3">
-        <h2 className="text-xl font-semibold mb-4">Add New Task</h2>
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-2">Title</label>
-            <input
-              type="text"
-              className="w-full px-3 py-2 border rounded"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              required
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-2">Priority</label>
-            <select
-              className="w-full px-3 py-2 border rounded"
-              value={priority}
-              onChange={(e) => setPriority(e.target.value)}>
-              <option value="Low">Low</option>
-              <option value="Medium">Medium</option>
-              <option value="High">High</option>
-            </select>
-          </div>
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-2">
-              Description
-            </label>
-            <textarea
-              className="w-full px-3 py-2 border rounded"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              required
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-2">Due Date</label>
-            <input
-              type="date"
-              className="w-full px-3 py-2 border rounded"
-              value={due}
-              onChange={(e) => setDue(e.target.value)}
-              required
-            />
-          </div>
-          <div className="flex justify-between">
-            <button
-              type="submit"
-              className="bg-blue-500 text-white px-4 py-2 rounded">
-              Add Task
-            </button>
-            <button
-              type="button"
-              onClick={onCancel}
-              className="bg-gray-500 text-white px-4 py-2 rounded">
-              Cancel
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
-};
-
-const Header = () => {
+const Header = ({ setIsAddingTask, setSort, setFilter, setSearch }) => {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isSortOpen, setIsSortOpen] = useState(false);
+  const [isFilterOrSort, setIsFilterOrSort] = useState(false);
+
+  const sortOptions = [
+    {
+      title: "Priority",
+      compareFn: () => (a: Task, b: Task) => {
+        const priorityOrder: Record<string, number> = {
+          High: 1,
+          Medium: 2,
+          Low: 3,
+        };
+        return priorityOrder[a.priority] - priorityOrder[b.priority];
+      },
+    },
+    {
+      title: "Name",
+      compareFn: () => (a: Task, b: Task) => a.title.localeCompare(b.title),
+    },
+    {
+      title: "Due",
+      compareFn: () => (a: Task, b: Task) => a.end > b.end,
+    },
+  ];
+
+  const filterOptions = [
+    {
+      title: "High",
+      value: "High",
+    },
+    {
+      title: "Medium",
+      value: "Medium",
+    },
+    {
+      title: "Low",
+      value: "Low",
+    },
+  ];
 
   const toggleFilterDropdown = () => {
     if (isSortOpen) setIsSortOpen(false);
@@ -107,29 +64,46 @@ const Header = () => {
 
   return (
     <div className="flex flex-col mb-6 w-full">
-      <h1 className="text-4xl font-bold mb-6">My Tasks</h1>
+      <div className="mb-6">
+        <h1 className="text-4xl font-bold">My Tasks</h1>
+        <p className="text-gray-500 mt-2">
+          Easily create, edit, and delete tasks with just a few clicks.{" "}
+          <span>
+            <button
+              onClick={setIsAddingTask}
+              className="text-blue-500 underline">
+              Create a task
+            </button>
+          </span>
+        </p>
+      </div>
       <div className="gap-2 grid grid-rows-2 sm:flex sm:flex-row sm:justify-between">
-        <div className="flex items-center gap-2">
+        <div className="flex gap-2">
           <div className="flex items-center space-x-4 relative">
             <button
               onClick={toggleFilterDropdown}
               className="flex items-center gap-2 py-1 px-2 border-2 rounded text-gray-700">
               <CiFilter />
               Filter
-              <IoIosArrowDown />
+              <IoIosArrowDown
+                className={`${isFilterOpen ? "" : "scale-y-[-1]"}`}
+              />
             </button>
             {isFilterOpen && (
               <div className="absolute -left-4 top-10 w-48 bg-white border rounded shadow-lg z-50">
                 <ul className="p-2">
-                  <li className="py-2 px-4 hover:bg-gray-100 cursor-pointer">
-                    Option 1
-                  </li>
-                  <li className="py-2 px-4 hover:bg-gray-100 cursor-pointer">
-                    Option 2
-                  </li>
-                  <li className="py-2 px-4 hover:bg-gray-100 cursor-pointer">
-                    Option 3
-                  </li>
+                  {filterOptions.map((opt, index) => (
+                    <li
+                      onClick={() => {
+                        setFilter(opt.value);
+                        setIsFilterOrSort(true);
+                        setIsFilterOpen(false);
+                      }}
+                      key={index}
+                      className="py-2 px-4 hover:bg-gray-100 cursor-pointer">
+                      {opt.title}
+                    </li>
+                  ))}
                 </ul>
               </div>
             )}
@@ -140,28 +114,47 @@ const Header = () => {
               className="flex items-center gap-2 py-1 px-2 border-2 rounded text-gray-700">
               <MdOutlineSort />
               Sort
-              <IoIosArrowDown />
+              <IoIosArrowDown
+                className={`${isSortOpen ? "" : "scale-y-[-1]"}`}
+              />
             </button>
 
             {isSortOpen && (
               <div className="absolute -left-4 top-10 w-48 bg-white border rounded shadow-lg z-50">
                 <ul className="p-2">
-                  <li className="py-2 px-4 hover:bg-gray-100 cursor-pointer">
-                    Option 1
-                  </li>
-                  <li className="py-2 px-4 hover:bg-gray-100 cursor-pointer">
-                    Option 2
-                  </li>
-                  <li className="py-2 px-4 hover:bg-gray-100 cursor-pointer">
-                    Option 3
-                  </li>
+                  {sortOptions.map((opt, index) => (
+                    <li
+                      key={index}
+                      onClick={() => {
+                        setSort(opt.compareFn);
+                        setIsSortOpen(false);
+                        setIsFilterOrSort(true);
+                      }}
+                      className="py-2 px-4 hover:bg-gray-100 cursor-pointer">
+                      {opt.title}
+                    </li>
+                  ))}
                 </ul>
               </div>
             )}
           </div>
+          {isFilterOrSort && (
+            <button
+              onClick={() => {
+                setSort(undefined);
+                setFilter(undefined);
+                setIsFilterOrSort(false);
+              }}
+              className="py-1 px-2 rounded text-white bg-red-500 hover:bg-red-400">
+              <IoIosClose />
+            </button>
+          )}
         </div>
         <div>
           <input
+            onChange={(e) => {
+              setSearch(e.target.value);
+            }}
             placeholder="Search..."
             type="text"
             className="h-full px-2 border rounded outline-none"
@@ -173,42 +166,67 @@ const Header = () => {
 };
 
 const TaskView = () => {
-  const { tasks, setTasks } = useTaskContext();
-  const [tasksData, setTasksData] = useState(tasks);
   const [isAddingTask, setIsAddingTask] = useState(false);
+  const [filterOption, setFilterOption] = useState(undefined);
+  const [search, setSearch] = useState("");
+  const { tasks, setTasks } = useTaskContext();
+  const [sortOption, setSortOption] = useState<
+    ((a: Task, b: Task) => number) | undefined
+  >(undefined);
 
-  const addNewTask = (task) => {
-    setTasksData((prevTasks) => {
-      return {
-        ...prevTasks,
-        todo: [...prevTasks.todo, task],
-      };
-    });
+  const addTask = (task: Task) => {
+    setTasks([
+      ...tasks,
+      { ...task, id: task.id === -1 ? tasks.length + 1 : task.id },
+    ]);
     setIsAddingTask(false);
   };
 
   const cancelAddingTask = () => {
     setIsAddingTask(false);
   };
+
+  const sortedTasks = (status: TaskStatus) => {
+    const filteredTasks = tasks
+      .filter(
+        (t) =>
+          t.status === status &&
+          (!filterOption || t.priority === filterOption) &&
+          (!search || t.title.toLowerCase().includes(search.toLowerCase()))
+      )
+      .sort(sortOption || (() => 0));
+
+    return filteredTasks;
+  };
+
   return (
     <div>
-      <Header />
+      <Header
+        setIsAddingTask={() => setIsAddingTask(true)}
+        setSearch={setSearch}
+        setSort={setSortOption}
+        setFilter={setFilterOption}
+      />
       {isAddingTask && (
-        <TaskInputForm onSubmit={addNewTask} onCancel={cancelAddingTask} />
+        <TaskInputForm onSubmit={addTask} onCancel={cancelAddingTask} />
       )}
       <div className="flex gap-4 lg:flex-row lg:items-start flex-col">
         <TaskColumn
           title="To Do"
-          tasks={tasksData.pending}
+          tasks={sortedTasks(TaskStatus.Pending)}
           color={Color.Blue}
           onAddTask={() => setIsAddingTask(true)}
         />
         <TaskColumn
           title="On Progress"
-          tasks={tasksData.onProgress}
+          tasks={sortedTasks(TaskStatus["OnGoing"])}
           color={Color.Orange}
         />
-        <TaskColumn title="Done" tasks={tasksData.done} color={Color.Green} />
+        <TaskColumn
+          title="Done"
+          tasks={sortedTasks(TaskStatus.Completed)}
+          color={Color.Green}
+        />
       </div>
     </div>
   );
