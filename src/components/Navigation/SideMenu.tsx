@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import SideMenuItem from "./SideMenuItems.tsx";
+import SideMenuItem from "../SideMenu/SideMenuItems.tsx";
 import { GoHome, GoCalendar } from "react-icons/go";
 
 interface SideMenuProps {
