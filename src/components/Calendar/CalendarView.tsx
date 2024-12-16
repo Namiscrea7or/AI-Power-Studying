@@ -21,19 +21,19 @@ const CalendarView = () => {
     const day = String(date.getDate()).padStart(2, "0");
     const hours = String(date.getHours()).padStart(2, "0");
     const minutes = String(date.getMinutes()).padStart(2, "0");
-    // Return formatted date as YYYY-MM-DDTHH:mm
+    // Return formatted date as YYYY-MM-DD HH:mm
     return `${year}-${month}-${day} ${hours}:${minutes}`;
   }
 
   const calendar: CalendarApp = useCalendarApp({
     views: [createViewWeek(), createViewMonthGrid()],
-    events: tasks.map((t) => {
-      return {
+    events: tasks
+      .filter((t) => t.start && t.end)
+      .map((t) => ({
         ...t,
-        start: formatDateToLocalDatetime(t.start),
-        end: formatDateToLocalDatetime(t.end),
-      };
-    }),
+        start: formatDateToLocalDatetime(new Date(t.start)),
+        end: formatDateToLocalDatetime(new Date(t.end)),
+      })),
     selectedDate: dateToString(new Date()),
     plugins: [createEventModalPlugin(), createDragAndDropPlugin()],
   });
