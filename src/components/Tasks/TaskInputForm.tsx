@@ -43,7 +43,7 @@ const TaskInputForm: React.FC<TaskInputFormProps> = ({
     if (!title) return;
 
     const newTask: Task = {
-      id: task?.id ?? -1,
+      id: task?.id ?? 1,
       title,
       priority,
       description,

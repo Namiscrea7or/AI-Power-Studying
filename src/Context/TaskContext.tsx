@@ -20,6 +20,7 @@ export enum TaskStatus {
   "Completed",
   "OnGoing",
   "Pending",
+  "Expired"
 }
 
 interface TaskContextType {

@@ -30,7 +30,7 @@ export const getTasks = async (): Promise<Task[]> => {
     }
 
     const jsonData = await response.json();
-    console.log(deserializeTasks(jsonData)[0])
+    console.log(jsonData)
     return deserializeTasks(jsonData);
   } catch (error) {
     console.error("Error fetching tasks:", error);
@@ -55,8 +55,13 @@ export const getTask = async (id: number): Promise<Task | null> => {
 };
 
 export const createTask = async (task: Task): Promise<Task> => {
+  console.log("task bthg: ", task)
   try {
+    // Serialize task
     const serializedTask = TaskSerializer.serialize(task);
+    console.log("Serialized Task:", serializedTask);
+
+    // Gửi request
     const response = await fetch(API_BASE_URL, {
       method: "POST",
       headers: {
@@ -66,6 +71,8 @@ export const createTask = async (task: Task): Promise<Task> => {
     });
 
     if (!response.ok) {
+      const errorResponse = await response.json();
+      console.error("Error details:", errorResponse);
       throw new Error(`Failed to create task: ${response.status} ${response.statusText}`);
     }
 
@@ -76,6 +83,7 @@ export const createTask = async (task: Task): Promise<Task> => {
     throw error;
   }
 };
+
 
 export const updateTask = async (task: Task): Promise<Task | null> => {
   try {
