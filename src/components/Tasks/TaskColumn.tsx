@@ -52,7 +52,6 @@ const TaskColumn: React.FC<TaskColumnProps> = ({
         );
 
         setCurrentTask(undefined);
-
         return true;
       }
 
