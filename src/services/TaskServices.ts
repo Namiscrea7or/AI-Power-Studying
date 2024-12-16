@@ -57,11 +57,9 @@ export const getTask = async (id: number): Promise<Task | null> => {
 export const createTask = async (task: Task): Promise<Task> => {
   console.log("task bthg: ", task)
   try {
-    // Serialize task
     const serializedTask = TaskSerializer.serialize(task);
     console.log("Serialized Task:", serializedTask);
 
-    // Gửi request
     const response = await fetch(API_BASE_URL, {
       method: "POST",
       headers: {
