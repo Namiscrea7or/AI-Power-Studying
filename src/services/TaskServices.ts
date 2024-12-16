@@ -4,7 +4,7 @@ import { Serializer } from "jsonapi-serializer";
 const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:3000/api";
 
 const TaskSerializer = new Serializer("studyTasks", {
-  attributes: ["title", "description", "priorityLevel", "status", "startDate", "dueDate", "estimatedTime"],
+  attributes: ["title", "description", "priority", "status", "start", "end", "estimatedTime"],
   keyForAttribute: "camelCase",
 });
 
@@ -88,6 +88,7 @@ export const createTask = async (task: Task): Promise<Task> => {
 export const updateTask = async (task: Task): Promise<Task | null> => {
   try {
     const serializedTask = TaskSerializer.serialize(task);
+    console.log(serializedTask)
     const response = await fetch(`${API_BASE_URL}/${task.id}`, {
       method: "PATCH",
       headers: {

@@ -5,6 +5,7 @@ import {
   useTaskContext,
 } from "../../Context/TaskContext.tsx";
 import { AiOutlineDelete } from "react-icons/ai";
+import * as taskService from "../../services/TaskServices.ts";
 
 interface TaskCardProps extends React.HTMLAttributes<HTMLDivElement> {
   task: Task;
@@ -19,8 +20,13 @@ const taskPriority = {
 const TaskCard: React.FC<TaskCardProps> = ({ task, ...props }) => {
   const { setTasks } = useTaskContext();
 
-  const deleteTask = (id: number) => {
-    setTasks((tasks) => tasks.filter((t) => t.id !== id));
+  const deleteTask = async (id: number) => {
+    try {
+      await taskService.deleteTask(id);
+      setTasks((tasks) => tasks.filter((t) => t.id !== id));
+    } catch (error) {
+      console.error("Error deleting task:", error);
+    }
   };
 
   const handleDeleteClick = (e: React.MouseEvent) => {
@@ -41,14 +47,14 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, ...props }) => {
       </div>
       <hr className="my-2" />
       <p className="text-sm text-gray-600">
-        <b>Start:</b> {task.start.toLocaleString()}
+        <b>Start:</b> {task?.start?.toLocaleString() ?? "Not set"}
       </p>
       <p className="text-sm text-gray-600 my-2">
         <b>Description: </b>
         {task.description}
       </p>
       <div className="flex justify-between items-center mt-4 text-sm text-gray-500">
-        <div>Due: {task.end.toLocaleString()}</div>
+        <div>Due: {task?.end?.toLocaleString() ?? "Not set"}</div>
         <button
           onClick={handleDeleteClick}
           className="text-red-500 bg-red-100 hover:bg-red-300 p-1 rounded">

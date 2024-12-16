@@ -22,7 +22,7 @@ const Navbar: React.FC = () => {
   };
 
   return (
-    <nav className="sticky bg-white top-0 z-50 border-b">
+    <nav className="sticky shadow bg-white top-0 z-50 border-b">
       <div className="mx-auto px-4 py-3 flex items-center justify-between">
         {/* Logo */}
         <div className="text-2xl font-bold text-blue-600">

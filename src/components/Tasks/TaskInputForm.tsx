@@ -3,7 +3,7 @@ import { Task, TaskPriority, TaskStatus } from "../../Context/TaskContext.tsx";
 
 type TaskInputFormProps = {
   task?: Task;
-  onSubmit: (task: any) => void;
+  onSubmit: (task: Task) => Promise<boolean>;
   onCancel: () => void;
 };
 
@@ -38,12 +38,12 @@ const TaskInputForm: React.FC<TaskInputFormProps> = ({
     onCancel();
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!title) return;
 
     const newTask: Task = {
-      id: task?.id ?? 1,
+      id: task?.id ?? -1,
       title,
       priority,
       description,
@@ -52,8 +52,13 @@ const TaskInputForm: React.FC<TaskInputFormProps> = ({
       status,
     };
 
-    clearForm();
-    onSubmit(newTask);
+    try {
+      const success = await onSubmit(newTask);
+      if (success) clearForm();
+    } catch (error) {
+      console.log(error);
+      return;
+    }
   };
 
   function formatDateToLocalDatetime(date: Date) {
@@ -68,7 +73,7 @@ const TaskInputForm: React.FC<TaskInputFormProps> = ({
 
   return (
     <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
-      <div className="bg-white max-h-[80%] overflow-y-auto p-6 rounded-lg shadow-lg w-1/3">
+      <div className="bg-white max-h-[80%] overflow-y-auto p-6 rounded-lg shadow-lg w-2/3 lg:w-1/3">
         <h2 className="text-xl font-semibold mb-4">
           {task ? "Task Detail" : "Add Task"}
         </h2>
