@@ -7,6 +7,7 @@ import MainPage from './pages/MainPage.tsx';
 import './App.css'
 import "@fontsource/inter";
 import Navbar from './components/Navigation/Navbar.tsx';
+import HomePage from './pages/Homepage.tsx';
 
 const App = () => {
   return (
@@ -22,7 +23,7 @@ const App = () => {
             <Route path='/profile' element={<Profile />} />
             <Route path="/signin" element={<Login />} />
             <Route path="/signup" element={<Register />} />
-            <Route path="/" element={<h1 className="text-center">Welcome!</h1>} />
+            <Route path="/" element={<HomePage />} />
           </Routes>
         </main>
       </div>
