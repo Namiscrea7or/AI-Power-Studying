@@ -9,3 +9,45 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
+
+
+.fc-header-toolbar {
+  padding: 0.75rem;
+  border-bottom: 1px solid #d0e4ff;
+}
+
+.fc-header-toolbar:not([style*="background-color:#e6f7ff"]) {
+    background-color: white;
+}
+.fc-header-toolbar:not([style*="background-color:#e6f7ff"])  .fc-toolbar-title{
+    color: #1e3a8a;
+}
+.fc-header-toolbar:not([style*="background-color:#e6f7ff"]) .fc-button {
+    color: #1e3a8a !important;
+    border: 1px solid #d0e4ff;
+}
+
+.fc-button {
+    background-color: #e6f7ff !important;
+    color: #1e3a8a;
+    border: 1px solid #d0e4ff;
+}
+
+.fc-button:hover {
+    background-color: #d0e4ff !important;
+}
+
+.fc-toolbar-title {
+  color: #1e3a8a;
+  font-weight: bold;
+}
+
+.fc .fc-toolbar .fc-button-group > .fc-button{
+   background-color: transparent !important;
+   color: #1e3a8a !important;
+}
+
+.fc .fc-toolbar .fc-button-group > .fc-button:hover{
+  background-color: #d0e4ff !important;
+  border-color: #d0e4ff !important
+}

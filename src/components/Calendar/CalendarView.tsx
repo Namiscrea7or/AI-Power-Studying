@@ -6,21 +6,11 @@ import interactionPlugin from '@fullcalendar/interaction';
 import { useTaskContext, TaskStatus } from "../../Context/TaskContext.tsx";
 import * as taskService from "../../services/TaskServices.ts";
 import { EventContentArg, EventClickArg } from '@fullcalendar/core';
-import { format } from 'date-fns';
-
-interface CalendarEvent {
-  id: string;
-  title: string;
-  start: Date;
-  end: Date;
-  description: string;
-}
 
 const CalendarView = () => {
     const { tasks, setTasks } = useTaskContext();
     const [selectedEvent, setSelectedEvent] = useState<any>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
-
 
     function formatDateToLocalDatetime(date: Date) {
         const year = date.getFullYear();
@@ -49,7 +39,6 @@ const CalendarView = () => {
          newStatus = TaskStatus.Pending;
        }
 
-
        const updatedTask = {
          ...originalTask,
          start: newStart,
@@ -57,7 +46,6 @@ const CalendarView = () => {
          status: newStatus,
        };
       setTasks(tasks.map((t) => (String(t.id) === eventId ? updatedTask : t)));
-
 
     try {
       const isUpdated = await taskService.updateTask(updatedTask);
@@ -83,17 +71,16 @@ const CalendarView = () => {
     }))
     const renderEventContent = (eventInfo: EventContentArg) => {
         const status = eventInfo.event.extendedProps.status;
-        let backgroundColorClass = "";
-        if (status === TaskStatus.Expired) {
-          backgroundColorClass = "bg-red-200";
+        let backgroundColorClass = "bg-blue-300";
+        if (status === TaskStatus.Completed) {
+          backgroundColorClass = "bg-yellow-200";
         }
         return (
-                <div className={`p-2 rounded-md ${backgroundColorClass}`}>
+                <div className={`p-2 rounded-md ${backgroundColorClass} text-gray-50`}>
                  {eventInfo.event.title}
                </div>
         );
     };
-
 
     const handleEventClick = (clickInfo: EventClickArg) => {
       setSelectedEvent(clickInfo.event);
@@ -103,11 +90,6 @@ const CalendarView = () => {
     const closeModal = () => {
         setIsModalOpen(false);
     };
-
-    const formatDateTime = (date: Date | null) => {
-        if(!date) return '';
-       return format(date, "EEE MMM dd yyyy HH:mm:ss zzz");
-     }
 
     return (
         <div className="p-4">
@@ -134,10 +116,10 @@ const CalendarView = () => {
                             <strong className="font-medium">Title:</strong> {selectedEvent.title}
                         </p>
                         <p className="mb-2">
-                            <strong className="font-medium">Start:</strong> {formatDateTime(selectedEvent.start)}
+                            <strong className="font-medium">Start:</strong> {formatDateToLocalDatetime(selectedEvent.start)}
                         </p>
                          <p className="mb-2">
-                            <strong className="font-medium">End:</strong> {formatDateTime(selectedEvent.end)}
+                            <strong className="font-medium">End:</strong> {formatDateToLocalDatetime(selectedEvent.end)}
                         </p>
                          <p className="mb-2">
                             <strong className="font-medium">Status:</strong> {selectedEvent.extendedProps.status}

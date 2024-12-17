@@ -9,10 +9,10 @@ import { Navigate } from "react-router-dom";
 const MainPage: React.FC = () => {
   const [activeView, setActiveView] = useState<string>("tasks");
 
-  // const auth = getAuth();
-  // if (!auth.currentUser) {
-  //   return <Navigate to={"/signin"} replace />;
-  // }
+  const auth = getAuth();
+  if (!auth.currentUser) {
+    return <Navigate to={"/signin"} replace />;
+  }
 
   const views: { [key: string]: JSX.Element } = {
     tasks: <TaskView />,
