@@ -198,6 +198,7 @@ const TaskView = () => {
     try {
       setLoading(true);
       const newTask = await taskService.createTask(task);
+      console.log(newTask);
       setTasks([...tasks, newTask]);
       setIsAddingTask(false);
       setLoading(false);

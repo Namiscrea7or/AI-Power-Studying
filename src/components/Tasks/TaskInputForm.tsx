@@ -52,6 +52,7 @@ const TaskInputForm: React.FC<TaskInputFormProps> = ({
       status,
     };
 
+    console.log(newTask);
     try {
       const success = await onSubmit(newTask);
       if (success) clearForm();
@@ -108,7 +109,6 @@ const TaskInputForm: React.FC<TaskInputFormProps> = ({
                 type="datetime-local"
                 className="w-full px-3 py-2 border rounded"
                 onChange={(e) => {
-                  console.log(new Date(e.target.value));
                   setStart(new Date(e.target.value));
                 }}
                 required

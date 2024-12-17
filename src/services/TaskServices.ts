@@ -45,15 +45,17 @@ function toDBTask(task: Task): DBTask {
   return dbtask;
 }
 const deserializeTask = (jsonData: any): Task => {
-    return {
+    const task : any = {
       id: parseInt(jsonData.id, 10),
       title: jsonData.attributes.title,
       description: jsonData.attributes.description,
       priority: jsonData.attributes.priorityLevel,
       status: jsonData.attributes.status,
-      start: jsonData.attributes.startDate,
-      end: jsonData.attributes.dueDate,
+      start: jsonData.attributes.startDate ? new Date(jsonData.attributes.startDate) : null,
+      end: jsonData.attributes.dueDate ? new Date(jsonData.attributes.dueDate) : null,
   }
+
+  return task;
 }
 
 export const getTasks = async (): Promise<Task[]> => {
