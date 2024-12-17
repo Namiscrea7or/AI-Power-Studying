@@ -55,7 +55,7 @@ const Register: React.FC = () => {
         createdAt: new Date().toISOString(),
       });
 
-      navigate("/profile");
+      navigate("/main");
     } catch (error: any) {
       alert(`Registration failed: ${error.message}`);
     }
@@ -82,7 +82,7 @@ const Register: React.FC = () => {
         createdAt: new Date().toISOString(),
       });
 
-      navigate("/profile");
+      navigate("/main");
     } catch (error: any) {
       alert(`Google Sign-Up failed: ${error.message}`);
     }

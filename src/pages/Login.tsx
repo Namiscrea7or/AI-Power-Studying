@@ -38,7 +38,7 @@ const Login: React.FC = () => {
         sameSite: "strict",
       });
 
-      navigate("/profile");
+      navigate("/main");
     } catch (error: any) {
       alert(`Login failed: ${error.message}`);
     }
@@ -58,7 +58,7 @@ const Login: React.FC = () => {
         sameSite: "strict",
       });
 
-      navigate("/profile");
+      navigate("/main");
     } catch (error) {
       alert(`Google Sign-In failed: ${error.message}`);
     }
