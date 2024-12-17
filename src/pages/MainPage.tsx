@@ -15,7 +15,7 @@ const MainPage: React.FC = () => {
   // }
 
   const views: { [key: string]: JSX.Element } = {
-    tasks: <TaskView />,
+    //tasks: <TaskView />,
     calendar: <CalendarView />,
     // analytics: <Analytics />,
     // settings: <Settings />,
