@@ -38,7 +38,7 @@ const TaskInputForm: React.FC<TaskInputFormProps> = ({
     onCancel();
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
     if (!title) return;
 
