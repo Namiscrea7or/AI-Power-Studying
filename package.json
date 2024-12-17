@@ -4,6 +4,10 @@
   "private": true,
   "dependencies": {
     "@fontsource/inter": "^5.1.0",
+    "@fullcalendar/daygrid": "^6.1.15",
+    "@fullcalendar/interaction": "^6.1.15",
+    "@fullcalendar/react": "^6.1.15",
+    "@fullcalendar/timegrid": "^6.1.15",
     "@schedule-x/calendar": "^2.11.0",
     "@schedule-x/drag-and-drop": "^2.11.0",
     "@schedule-x/event-modal": "^2.11.0",
