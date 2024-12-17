@@ -52,7 +52,6 @@ const TaskInputForm: React.FC<TaskInputFormProps> = ({
       status,
     };
 
-    console.log(newTask);
     try {
       const success = await onSubmit(newTask);
       if (success) clearForm();
@@ -132,22 +131,22 @@ const TaskInputForm: React.FC<TaskInputFormProps> = ({
               <label className="block text-sm font-medium mb-2">Priority</label>
               <select
                 className="w-full p-2 border rounded"
-                value={priority}
+                value={TaskPriority[priority]}
                 onChange={(e) => setPriority(TaskPriority[e.target.value])}>
-                <option value={TaskPriority.Low}>Low</option>
-                <option value={TaskPriority.Medium}>Medium</option>
-                <option value={TaskPriority.High}>High</option>
+                <option value={"Low"}>Low</option>
+                <option value={"Medium"}>Medium</option>
+                <option value={"High"}>High</option>
               </select>
             </div>
             <div className="mb-4">
               <label className="block text-sm font-medium mb-2">Status</label>
               <select
                 className="w-full p-2 border rounded"
-                value={status}
+                value={TaskStatus[status]}
                 onChange={(e) => setStatus(TaskStatus[e.target.value])}>
-                <option value={TaskStatus.Pending}>To Do</option>
-                <option value={TaskStatus["OnGoing"]}>In Progress</option>
-                <option value={TaskStatus.Completed}>Completed</option>
+                <option value={"Pending"}>To Do</option>
+                <option value={"OnGoing"}>In Progress</option>
+                <option value={"Completed"}>Completed</option>
               </select>
             </div>
           </div>

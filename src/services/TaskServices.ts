@@ -80,25 +80,22 @@ export const getTask = async (id: number): Promise<Task | null> => {
 
 export const createTask = async (task: Task): Promise<Task> => {
   try {
-    const serializedTask = TaskSerializer.serialize(task);
-    console.log("Serialized Task:", serializedTask);
+    // Serialize task
+    const dbtask = toDBTask(task);
+    const serializedTask = TaskSerializer.serialize(dbtask);
 
-    const response = await fetch(API_BASE_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/vnd.api+json",
-      },
-      body: JSON.stringify(serializedTask),
+    // Gửi request
+    const response = await axios.post(
+      API_BASE_URL, 
+      JSON.stringify(serializedTask), 
+      {
+        headers: {
+          "Accept": "application/vnd.api+json",
+          "Content-Type": "application/vnd.api+json",
+        }
     });
 
-    if (!response.ok) {
-      const errorResponse = await response.json();
-      console.error("Error details:", errorResponse);
-      throw new Error(`Failed to create task: ${response.status} ${response.statusText}`);
-    }
-
-    const jsonData = await response.json();
-    return deserializeTask(jsonData);
+    return deserializeTask(response.data.data);
   } catch (error) {
     console.error("Error creating task:", error);
     throw error;

@@ -19,7 +19,6 @@ const taskPriority = {
 
 const TaskCard: React.FC<TaskCardProps> = ({ task, ...props }) => {
   const { setTasks } = useTaskContext();
-  console.log(task.start);
   const deleteTask = async (id: number) => {
     try {
       await taskService.deleteTask(id);
