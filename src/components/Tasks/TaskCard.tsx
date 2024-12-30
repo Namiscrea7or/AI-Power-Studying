@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Task,
   TaskPriority,
@@ -6,6 +6,7 @@ import {
 } from "../../Context/TaskContext.tsx";
 import { AiOutlineDelete } from "react-icons/ai";
 import * as taskService from "../../services/TaskServices.ts";
+import TimerPopup from "./TimerPopup.tsx";
 
 interface TaskCardProps extends React.HTMLAttributes<HTMLDivElement> {
   task: Task;
@@ -19,6 +20,8 @@ const taskPriority = {
 
 const TaskCard: React.FC<TaskCardProps> = ({ task, ...props }) => {
   const { setTasks } = useTaskContext();
+  const [showTimer, setShowTimer] = useState(false);
+
   const deleteTask = async (id: number) => {
     try {
       await taskService.deleteTask(id);
@@ -31,6 +34,11 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, ...props }) => {
   const handleDeleteClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     deleteTask(task.id);
+  };
+
+  const handleTimerClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setShowTimer(true);
   };
 
   return (
@@ -54,12 +62,20 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, ...props }) => {
       </p>
       <div className="flex justify-between items-center mt-4 text-sm text-gray-500">
         <div>Due: {task?.end?.toLocaleString() ?? "Not set"}</div>
-        <button
-          onClick={handleDeleteClick}
-          className="text-red-500 bg-red-100 hover:bg-red-300 p-1 rounded">
-          <AiOutlineDelete />
-        </button>
+        <div className="flex space-x-2">
+          <button
+            onClick={handleTimerClick}
+            className="text-blue-500 bg-blue-100 hover:bg-blue-300 p-1 rounded">
+            Start Timer
+          </button>
+          <button
+            onClick={handleDeleteClick}
+            className="text-red-500 bg-red-100 hover:bg-red-300 p-1 rounded">
+            <AiOutlineDelete />
+          </button>
+        </div>
       </div>
+      {showTimer && <TimerPopup onClose={() => setShowTimer(false)} />}
     </div>
   );
 };
