@@ -6,6 +6,7 @@ import {
 } from "../../Context/TaskContext.tsx";
 import { AiOutlineDelete } from "react-icons/ai";
 import * as taskService from "../../services/TaskServices.ts";
+import { toast } from "react-toastify";
 
 interface TaskCardProps extends React.HTMLAttributes<HTMLDivElement> {
   task: Task;
@@ -24,7 +25,12 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, ...props }) => {
       await taskService.deleteTask(id);
       setTasks((tasks) => tasks.filter((t) => t.id !== id));
     } catch (error) {
-      console.error("Error deleting task:", error);
+      toast.error(
+        <div>
+          <label className="font-bold">Delete Task Failed</label>
+          <p> Please try again later!</p>
+        </div>
+      );
     }
   };
 

@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import Cookies from "js-cookie";
 import { auth, googleProvider } from "../firebase/firebase.config";
+import { toast } from "react-toastify";
 
 // Define the structure of form data
 type SignInFormInputs = {
@@ -40,7 +41,12 @@ const Login: React.FC = () => {
 
       navigate("/main");
     } catch (error: any) {
-      alert(`Login failed: ${error.message}`);
+      toast.error(
+        <div>
+          <label className="font-bold">Login Failed</label>
+          <p> Please try again later!</p>
+        </div>
+      );
     }
   };
 
@@ -135,7 +141,12 @@ const Login: React.FC = () => {
             <button
               onClick={handleGoogleSignIn}
               className="flex items-center space-x-2 px-4 py-2 border rounded-md hover:bg-gray-100 focus:outline-none">
-              <img width="48" height="48" src="https://img.icons8.com/color/48/google-logo.png" alt="google-logo"/>
+              <img
+                width="48"
+                height="48"
+                src="https://img.icons8.com/color/48/google-logo.png"
+                alt="google-logo"
+              />
               <span>Google</span>
             </button>
           </div>

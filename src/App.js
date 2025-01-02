@@ -8,6 +8,7 @@ import './App.css'
 import "@fontsource/inter";
 import Navbar from './components/Navigation/Navbar.tsx';
 import HomePage from './pages/Homepage.tsx';
+import { ToastContainer, Bounce } from 'react-toastify';
 
 const App = () => {
   return (
@@ -26,6 +27,20 @@ const App = () => {
             <Route path="/" element={<HomePage />} />
           </Routes>
         </main>
+        <ToastContainer
+          className="z-100"
+          position="top-right"
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss={false}
+          draggable={false}
+          pauseOnHover={false}
+          theme="light"
+          transition={Bounce}
+        />
       </div>
     </Router>
   );

@@ -10,6 +10,7 @@ import {
 } from "../../Context/TaskContext.tsx";
 import TaskInputForm from "../Tasks/TaskInputForm.tsx";
 import * as taskService from "../../services/TaskServices.ts";
+import { toast } from "react-toastify";
 
 const Header = ({ setIsAddingTask, setSort, setFilter, setSearch }) => {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -176,7 +177,6 @@ const TaskView = () => {
   >(undefined);
 
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchTasksFromAPI = async () => {
@@ -184,8 +184,12 @@ const TaskView = () => {
         const fetchedTasks = await taskService.getTasks();
         setTasks(fetchedTasks);
       } catch (err) {
-        console.error("Failed to fetch tasks:", err);
-        setError("Failed to fetch tasks. Please try again later.");
+        toast.error(
+          <div>
+            <label className="font-bold">Fetch Task Failed</label>
+            <p> Please try again later!</p>
+          </div>
+        );
       } finally {
         setLoading(false);
       }
@@ -203,8 +207,12 @@ const TaskView = () => {
       setLoading(false);
       return true;
     } catch (error) {
-      console.error("Error adding task:", error);
-      setError("Failed to add task. Please try again.");
+      toast.error(
+        <div>
+          <label className="font-bold">Fetch Task Failed</label>
+          <p> Please try again later!</p>
+        </div>
+      );
       return false;
     }
   };
@@ -228,10 +236,6 @@ const TaskView = () => {
 
   if (loading) {
     return <div>Loading Tasks...</div>;
-  }
-
-  if (error) {
-    return <div>Error: {error}</div>;
   }
 
   return (

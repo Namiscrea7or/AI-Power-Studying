@@ -7,7 +7,7 @@ const HoverAIButton = () => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalContent, setModalContent] = useState(undefined);
+  const [modalContent, setModalContent] = useState("Analyze");
   return (
     <div
       className="fixed bottom-4 right-4 z-50 flex flex-col items-end gap-2"
@@ -16,13 +16,19 @@ const HoverAIButton = () => {
       {isExpanded && (
         <>
           <button
-            onClick={() => setIsModalOpen(true)}
+            onClick={() => {
+              setIsModalOpen(true);
+              setModalContent("Analyze");
+            }}
             className="flex items-center gap-2 p-4 rounded-full bg-blue-400 text-white shadow-lg hover:bg-blue-700 transition-all">
             <TbAnalyze />
             Analyze
           </button>
           <button
-            onClick={() => setIsModalOpen(true)}
+            onClick={() => {
+              setIsModalOpen(true);
+              setModalContent("Suggestions");
+            }}
             className="flex items-center gap-2 p-4 rounded-full bg-blue-400 text-white shadow-lg hover:bg-blue-700 transition-all">
             <PiMagicWandLight />
             Suggestions
@@ -42,7 +48,10 @@ const HoverAIButton = () => {
       </button>
 
       {isModalOpen && (
-        <ModalAI onClose={() => setIsModalOpen(false)} content={modalContent} />
+        <ModalAI
+          onClose={() => setIsModalOpen(false)}
+          contentType={modalContent}
+        />
       )}
     </div>
   );

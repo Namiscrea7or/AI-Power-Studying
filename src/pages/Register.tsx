@@ -6,6 +6,7 @@ import { createUserWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { getFirestore, doc, setDoc } from "firebase/firestore";
 import Cookies from "js-cookie";
+import { toast } from "react-toastify";
 
 const db = getFirestore();
 
@@ -19,22 +20,38 @@ type RegisterFormInputs = {
 
 const Register: React.FC = () => {
   const navigate = useNavigate();
-  
-  const { register, handleSubmit, formState: { errors } } = useForm<RegisterFormInputs>();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<RegisterFormInputs>();
 
   const onSubmit: SubmitHandler<RegisterFormInputs> = async (data) => {
     try {
       if (data.password !== data.confirmPassword) {
-        alert("Passwords do not match!");
+        toast.warn(
+          <div>
+            <label className="font-bold">Password mismatch</label>
+            <p> Please enter the same password!</p>
+          </div>
+        );
         return;
       }
 
-      const userCredential = await createUserWithEmailAndPassword(auth, data.email, data.password);
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        data.email,
+        data.password
+      );
 
       let photoURL = "";
       if (data.photo && data.photo[0]) {
         const photo = data.photo[0];
-        const storageRef = ref(storage, `users/${userCredential.user.uid}/profile.jpg`);
+        const storageRef = ref(
+          storage,
+          `users/${userCredential.user.uid}/profile.jpg`
+        );
         await uploadBytes(storageRef, photo);
         photoURL = await getDownloadURL(storageRef);
       }
@@ -57,7 +74,12 @@ const Register: React.FC = () => {
 
       navigate("/main");
     } catch (error: any) {
-      alert(`Registration failed: ${error.message}`);
+      toast.error(
+        <div>
+          <label className="font-bold">Register Failed</label>
+          <p> Please try again later!</p>
+        </div>
+      );
     }
   };
 
@@ -96,7 +118,9 @@ const Register: React.FC = () => {
         </h2>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
-            <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="username"
+              className="block text-sm font-medium text-gray-700">
               Username
             </label>
             <input
@@ -105,10 +129,16 @@ const Register: React.FC = () => {
               {...register("username", { required: "Username is required" })}
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
             />
-            {errors.username && <p className="text-red-500 text-sm mt-1">{errors.username.message}</p>}
+            {errors.username && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.username.message}
+              </p>
+            )}
           </div>
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-700">
               Email
             </label>
             <input
@@ -117,10 +147,16 @@ const Register: React.FC = () => {
               {...register("email", { required: "Email is required" })}
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
             />
-            {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>}
+            {errors.email && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.email.message}
+              </p>
+            )}
           </div>
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-gray-700">
               Password
             </label>
             <input
@@ -129,24 +165,36 @@ const Register: React.FC = () => {
               {...register("password", { required: "Password is required" })}
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
             />
-            {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>}
+            {errors.password && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.password.message}
+              </p>
+            )}
           </div>
           <div>
-            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="confirmPassword"
+              className="block text-sm font-medium text-gray-700">
               Confirm Password
             </label>
             <input
               type="password"
               id="confirmPassword"
-              {...register("confirmPassword", { required: "Confirm Password is required" })}
+              {...register("confirmPassword", {
+                required: "Confirm Password is required",
+              })}
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
             />
             {errors.confirmPassword && (
-              <p className="text-red-500 text-sm mt-1">{errors.confirmPassword.message}</p>
+              <p className="text-red-500 text-sm mt-1">
+                {errors.confirmPassword.message}
+              </p>
             )}
           </div>
           <div>
-            <label htmlFor="photo" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="photo"
+              className="block text-sm font-medium text-gray-700">
               Profile Photo
             </label>
             <input
@@ -162,7 +210,6 @@ const Register: React.FC = () => {
             className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring focus:ring-blue-300">
             Register
           </button>
-
         </form>
         <div className="mt-6">
           <p className="text-center text-gray-500">Or sign up with</p>
@@ -170,7 +217,12 @@ const Register: React.FC = () => {
             <button
               onClick={handleGoogleSignUp}
               className="flex items-center space-x-2 px-4 py-2 border rounded-md hover:bg-gray-100 focus:outline-none">
-              <img width="48" height="48" src="https://img.icons8.com/color/48/google-logo.png" alt="google-logo"/>
+              <img
+                width="48"
+                height="48"
+                src="https://img.icons8.com/color/48/google-logo.png"
+                alt="google-logo"
+              />
               <span>Google</span>
             </button>
           </div>

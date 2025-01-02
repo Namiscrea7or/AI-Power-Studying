@@ -5,6 +5,7 @@ import TaskCard from "./TaskCard.tsx";
 import { Task, useTaskContext } from "../../Context/TaskContext.tsx";
 import TaskInputForm from "./TaskInputForm.tsx";
 import * as taskService from "../../services/TaskServices.ts";
+import { toast } from "react-toastify";
 
 type TaskColumnProps = {
   title: string;
@@ -55,10 +56,17 @@ const TaskColumn: React.FC<TaskColumnProps> = ({
         return true;
       }
 
-      console.error(`Task with ID ${updatedTask.id} not found.`);
+      toast.error(`Task not found or has been deleted!`, {
+        ariaLabel: "Edit task failed",
+      });
       return false;
     } catch (error) {
-      console.error("Error updating task:", error);
+      toast.error(
+        <div>
+          <label className="font-bold">Edit Task Failed</label>
+          <p> Please try again later!</p>
+        </div>
+      );
       return false;
     }
   };
