@@ -42,7 +42,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, ...props }) => {
   };
 
   return (
-    <div {...props} className="bg-white shadow rounded-lg p-4 mb-4">
+    <div {...props} className="bg-white shadow rounded-lg p-4 mb-4 relative">
       <div className="flex justify-between items-center">
         <h4 className="text-lg font-semibold">{task.title}</h4>
         <span
@@ -75,7 +75,11 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, ...props }) => {
           </button>
         </div>
       </div>
-      {showTimer && <TimerPopup onClose={() => setShowTimer(false)} />}
+      {showTimer && (
+        <div onClick={(e) => e.stopPropagation()}>
+          <TimerPopup task={task} onClose={() => setShowTimer(false)} />
+        </div>
+      )}
     </div>
   );
 };
