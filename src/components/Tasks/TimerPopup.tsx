@@ -79,7 +79,7 @@ const TimerPopup: React.FC<TimerPopupProps> = ({ task, onClose, updateTask }) =>
         <div className="text-center mb-4">
           <h3 className="text-lg font-semibold">{task.title}</h3>
           <p className="text-sm text-gray-600">{task.description}</p>
-          <p className="text-sm text-gray-600">Progress Time: {formatTime(task.progressTime)}</p>
+          {/* <p className="text-sm text-gray-600">Progress Time: {formatTime(task.progressTime)}</p> */}
         </div>
         <div className="flex justify-around mb-4">
           <button
