@@ -4,9 +4,10 @@ import { Task } from "../../Context/TaskContext.tsx";
 interface TimerPopupProps {
   task: Task;
   onClose: () => void;
+  updateTask: (updatedTask: Task) => void;
 }
 
-const TimerPopup: React.FC<TimerPopupProps> = ({ task, onClose }) => {
+const TimerPopup: React.FC<TimerPopupProps> = ({ task, onClose, updateTask }) => {
   const [isWork, setIsWork] = useState(true);
   const [workTime, setWorkTime] = useState(1500); // 25 minutes
   const [breakTime, setBreakTime] = useState(300); // 5 minutes
@@ -34,9 +35,10 @@ const TimerPopup: React.FC<TimerPopupProps> = ({ task, onClose }) => {
   }, [timer, isWork, breakTime, workTime]);
 
   const formatTime = (seconds: number) => {
-    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
     const secs = seconds % 60;
-    return `${minutes}:${secs < 10 ? "0" : ""}${secs}`;
+    return `${hours}:${minutes < 10 ? "0" : ""}${minutes}:${secs < 10 ? "0" : ""}${secs}`;
   };
 
   const handleStart = () => {
@@ -60,6 +62,12 @@ const TimerPopup: React.FC<TimerPopupProps> = ({ task, onClose }) => {
     setTimeLeft(1500);
   };
 
+  const handleClose = () => {
+    handlePause();
+    updateTask({ ...task, progressTime: task.progressTime + (1500 - timeLeft) });
+    onClose();
+  };
+
   return (
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50">
       <div className="bg-white p-6 rounded shadow-lg w-80">
@@ -71,6 +79,7 @@ const TimerPopup: React.FC<TimerPopupProps> = ({ task, onClose }) => {
         <div className="text-center mb-4">
           <h3 className="text-lg font-semibold">{task.title}</h3>
           <p className="text-sm text-gray-600">{task.description}</p>
+          <p className="text-sm text-gray-600">Progress Time: {formatTime(task.progressTime)}</p>
         </div>
         <div className="flex justify-around mb-4">
           <button
@@ -94,7 +103,7 @@ const TimerPopup: React.FC<TimerPopupProps> = ({ task, onClose }) => {
         </div>
         <div className="text-center">
           <button
-            onClick={onClose}
+            onClick={handleClose}
             className="bg-gray-500 text-white px-4 py-2 rounded"
           >
             Close

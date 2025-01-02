@@ -18,6 +18,13 @@ const taskPriority = {
   Low: "bg-gray-100 text-gray-700",
 };
 
+const formatTime = (seconds: number) => {
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const secs = seconds % 60;
+  return `${hours}:${minutes < 10 ? "0" : ""}${minutes}:${secs < 10 ? "0" : ""}${secs}`;
+};
+
 const TaskCard: React.FC<TaskCardProps> = ({ task, ...props }) => {
   const { setTasks } = useTaskContext();
   const [showTimer, setShowTimer] = useState(false);
@@ -41,6 +48,10 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, ...props }) => {
     setShowTimer(true);
   };
 
+  const updateTask = (updatedTask: Task) => {
+    setTasks((tasks) => tasks.map((t) => (t.id === updatedTask.id ? updatedTask : t)));
+  };
+
   return (
     <div {...props} className="bg-white shadow rounded-lg p-4 mb-4 relative">
       <div className="flex justify-between items-center">
@@ -60,6 +71,10 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, ...props }) => {
         <b>Description: </b>
         {task.description}
       </p>
+      <p className="text-sm text-gray-600 my-2">
+        <b>Progress Time: </b>
+        {formatTime(task.progressTime)}
+      </p>
       <div className="flex justify-between items-center mt-4 text-sm text-gray-500">
         <div>Due: {task?.end?.toLocaleString() ?? "Not set"}</div>
         <div className="flex space-x-2">
@@ -77,7 +92,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, ...props }) => {
       </div>
       {showTimer && (
         <div onClick={(e) => e.stopPropagation()}>
-          <TimerPopup task={task} onClose={() => setShowTimer(false)} />
+          <TimerPopup task={task} onClose={() => setShowTimer(false)} updateTask={updateTask} />
         </div>
       )}
     </div>

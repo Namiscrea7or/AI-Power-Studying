@@ -9,6 +9,7 @@ export const mockTasks: Task[] = [
     status: TaskStatus.Pending,
     start: new Date(),
     end: new Date(Date.now() + 3600 * 1000),
+    progressTime: 3700,
   },
   {
     id: 2,
@@ -18,5 +19,6 @@ export const mockTasks: Task[] = [
     status: TaskStatus.OnGoing,
     start: new Date(),
     end: new Date(Date.now() + 7200 * 1000),
+    progressTime: 0,
   },
 ];
