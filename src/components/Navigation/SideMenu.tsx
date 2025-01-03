@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import SideMenuItem from "../SideMenu/SideMenuItems.tsx";
-import { GoHome, GoCalendar } from "react-icons/go";
+import { GoHome, GoCalendar, GoGraph } from "react-icons/go";
 
 interface SideMenuProps {
   setActiveView: (key: string) => void;
@@ -14,6 +14,7 @@ const SideMenu: React.FC<SideMenuProps> = ({
   const menuItems = [
     { name: "Tasks", key: "tasks", icon: <GoHome /> },
     { name: "Calendar", key: "calendar", icon: <GoCalendar /> },
+    { name: "Analytics", key: "analytics", icon: <GoGraph /> },
   ];
 
   const [activeKey, setActiveKey] = useState<string>(defaultActiveKey);
