@@ -9,23 +9,24 @@ interface TimerPopupProps {
 
 const TimerPopup: React.FC<TimerPopupProps> = ({ task, onClose, updateTask }) => {
   const [isWork, setIsWork] = useState(true);
-  const [workTime, setWorkTime] = useState(1500); // 25 minutes
-  const [breakTime, setBreakTime] = useState(300); // 5 minutes
-  const [timeLeft, setTimeLeft] = useState(1500);
+  const [workTime, setWorkTime] = useState(1500); // Default 25 minutes
+  const [breakTime, setBreakTime] = useState(300); // Default 5 minutes
+  const [timeLeft, setTimeLeft] = useState(workTime);
   const [timer, setTimer] = useState<NodeJS.Timeout | null>(null);
+  const [showNotification, setShowNotification] = useState(false);
+
+  useEffect(() => {
+    setTimeLeft(workTime);
+  }, [workTime]);
 
   useEffect(() => {
     if (timer) {
       const interval = setInterval(() => {
         setTimeLeft((prevTime) => {
           if (prevTime === 0) {
-            if (isWork) {
-              setIsWork(false);
-              return breakTime;
-            } else {
-              setIsWork(true);
-              return workTime;
-            }
+            clearInterval(interval);
+            setShowNotification(true);
+            return isWork ? breakTime : workTime;
           }
           return prevTime - 1;
         });
@@ -35,10 +36,9 @@ const TimerPopup: React.FC<TimerPopupProps> = ({ task, onClose, updateTask }) =>
   }, [timer, isWork, breakTime, workTime]);
 
   const formatTime = (seconds: number) => {
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
+    const minutes = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    return `${hours}:${minutes < 10 ? "0" : ""}${minutes}:${secs < 10 ? "0" : ""}${secs}`;
+    return `${minutes}:${secs < 10 ? "0" : ""}${secs}`;
   };
 
   const handleStart = () => {
@@ -56,16 +56,28 @@ const TimerPopup: React.FC<TimerPopupProps> = ({ task, onClose, updateTask }) =>
 
   const handleReset = () => {
     handlePause();
-    setWorkTime(1500);
-    setBreakTime(300);
+    setTimeLeft(workTime);
     setIsWork(true);
-    setTimeLeft(1500);
   };
 
   const handleClose = () => {
     handlePause();
-    updateTask({ ...task, progressTime: task.progressTime + (1500 - timeLeft) });
+    updateTask({ ...task, progressTime: task.progressTime + (workTime - timeLeft) });
     onClose();
+  };
+
+  const handleContinue = () => {
+    setIsWork(true);
+    setTimeLeft(workTime);
+    setShowNotification(false);
+    handleStart();
+  };
+
+  const handleBreak = () => {
+    setIsWork(false);
+    setTimeLeft(breakTime);
+    setShowNotification(false);
+    handleStart();
   };
 
   return (
@@ -79,7 +91,7 @@ const TimerPopup: React.FC<TimerPopupProps> = ({ task, onClose, updateTask }) =>
         <div className="text-center mb-4">
           <h3 className="text-lg font-semibold">{task.title}</h3>
           <p className="text-sm text-gray-600">{task.description}</p>
-          {/* <p className="text-sm text-gray-600">Progress Time: {formatTime(task.progressTime)}</p> */}
+          <p className="text-sm text-gray-600">Progress Time: {formatTime(task.progressTime)}</p>
         </div>
         <div className="flex justify-around mb-4">
           <button
@@ -101,6 +113,26 @@ const TimerPopup: React.FC<TimerPopupProps> = ({ task, onClose, updateTask }) =>
             Reset
           </button>
         </div>
+        <div className="text-center mb-4">
+          <label className="block mb-2">
+            Work Time (minutes):
+            <input
+              type="number"
+              value={workTime / 60}
+              onChange={(e) => setWorkTime(Number(e.target.value) * 60)}
+              className="ml-2 p-1 border rounded"
+            />
+          </label>
+          <label className="block mb-2">
+            Break Time (minutes):
+            <input
+              type="number"
+              value={breakTime / 60}
+              onChange={(e) => setBreakTime(Number(e.target.value) * 60)}
+              className="ml-2 p-1 border rounded"
+            />
+          </label>
+        </div>
         <div className="text-center">
           <button
             onClick={handleClose}
@@ -110,6 +142,30 @@ const TimerPopup: React.FC<TimerPopupProps> = ({ task, onClose, updateTask }) =>
           </button>
         </div>
       </div>
+      {showNotification && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white p-6 rounded shadow-lg w-80">
+            <h2 className="text-lg font-semibold mb-4 text-center">Session Ended</h2>
+            <div className="text-center mb-4">
+              <p className="text-xl font-bold">What would you like to do next?</p>
+            </div>
+            <div className="flex justify-around mb-4">
+              <button
+                onClick={handleContinue}
+                className="bg-green-500 text-white px-4 py-2 rounded"
+              >
+                Continue Focus
+              </button>
+              <button
+                onClick={handleBreak}
+                className="bg-blue-500 text-white px-4 py-2 rounded"
+              >
+                Take a Break
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
