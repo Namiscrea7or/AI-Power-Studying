@@ -11,6 +11,7 @@ import {
 import TaskInputForm from "../Tasks/TaskInputForm.tsx";
 import * as taskService from "../../services/TaskServices.ts";
 import { toast } from "react-toastify";
+import HoverAIButton from "../AI/ButtonAI.tsx";
 
 const Header = ({ setIsAddingTask, setSort, setFilter, setSearch }) => {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -239,7 +240,7 @@ const TaskView = () => {
   }
 
   return (
-    <div>
+    <div className="relative">
       <Header
         setIsAddingTask={() => setIsAddingTask(true)}
         setSearch={setSearch}
@@ -249,7 +250,7 @@ const TaskView = () => {
       {isAddingTask && (
         <TaskInputForm onSubmit={addTask} onCancel={cancelAddingTask} />
       )}
-      <div className="flex gap-4 lg:flex-row lg:items-start flex-col">
+      <div className="flex gap-4 lg:flex-row lg:items-start flex-col overflow-x-auto">
         <TaskColumn
           title="To Do"
           tasks={sortedTasks(TaskStatus.Pending)}
@@ -266,7 +267,13 @@ const TaskView = () => {
           tasks={sortedTasks(TaskStatus.Completed)}
           color={Color.Green}
         />
+        <TaskColumn
+          title="Expired"
+          tasks={sortedTasks(TaskStatus.Completed)}
+          color={Color.Red}
+        />
       </div>
+      <HoverAIButton />
     </div>
   );
 };

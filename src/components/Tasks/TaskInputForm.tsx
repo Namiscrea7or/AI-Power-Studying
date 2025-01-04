@@ -156,6 +156,7 @@ const TaskInputForm: React.FC<TaskInputFormProps> = ({
                 <option value={"Pending"}>To Do</option>
                 <option value={"OnGoing"}>In Progress</option>
                 <option value={"Completed"}>Completed</option>
+                <option value={"Expired"}>Expired</option>
               </select>
             </div>
           </div>

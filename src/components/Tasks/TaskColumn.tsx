@@ -18,6 +18,7 @@ enum Color {
   Blue,
   Orange,
   Green,
+  Red,
 }
 
 const colors = {
@@ -32,6 +33,10 @@ const colors = {
   [Color.Green]: {
     bg: "bg-green-400",
     border: "border-green-400",
+  },
+  [Color.Red]: {
+    bg: "bg-red-400",
+    border: "border-red-400",
   },
 };
 
@@ -72,7 +77,7 @@ const TaskColumn: React.FC<TaskColumnProps> = ({
   };
 
   return (
-    <div className="lg:flex-shrink-1 w-full lg:w-1/3 p-4 bg-[#f5f5f5] rounded-lg">
+    <div className="w-full lg:w-1/4 p-4 bg-[#f5f5f5] rounded-lg">
       <div className="w-full flex items-center mb-1">
         <div className={cn(`w-4 h-4 rounded-full me-2`, colors[color].bg)} />
         {title !== "To Do" ? (

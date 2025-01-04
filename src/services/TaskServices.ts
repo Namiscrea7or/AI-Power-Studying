@@ -63,8 +63,7 @@ export const getTasks = async (): Promise<Task[]> => {
     const response = await axios.get(`${API_BASE_URL}`);
     return deserializeTasks(response.data);
   } catch (error) {
-    console.error("Error fetching tasks:", error);
-    return [];
+    throw error;
   }
 };
 

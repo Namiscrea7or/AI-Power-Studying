@@ -54,7 +54,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, ...props }) => {
       <p className="text-sm text-gray-600">
         <b>Start:</b> {task?.start?.toLocaleString() ?? "Not set"}
       </p>
-      <p className="text-sm text-gray-600 my-2">
+      <p className="text-sm text-gray-600 my-2 break-words line-clamp-3">
         <b>Description: </b>
         {task.description}
       </p>

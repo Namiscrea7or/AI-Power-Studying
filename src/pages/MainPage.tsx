@@ -5,7 +5,6 @@ import TaskView from "../components/TaskView/TaskView.tsx";
 import { TaskProvider } from "../Context/TaskContext.tsx";
 import { getAuth } from "firebase/auth";
 import { Navigate } from "react-router-dom";
-import HoverAIButton from "../components/AI/ButtonAI.tsx";
 
 const MainPage: React.FC = () => {
   const [activeView, setActiveView] = useState<string>("tasks");
@@ -29,7 +28,6 @@ const MainPage: React.FC = () => {
         <div className="lg:ml-[20%] p-8 flex-grow">
           {views[activeView] || <p>View not found</p>}
         </div>
-        <HoverAIButton />
       </TaskProvider>
     </div>
   );
