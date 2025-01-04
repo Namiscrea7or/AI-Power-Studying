@@ -18,7 +18,7 @@ const Content: React.FC<{ content: string; suggestions: string[] }> = ({
           {content}
         </p>
       </div>
-      {suggestions.length > 0 ? (
+      {suggestions.length > 0 && (
         <div className="flex flex-col gap-2">
           <h3 className="text-lg font-semibold">Suggestions</h3>
           <div className="flex flex-col gap-2">
@@ -32,8 +32,6 @@ const Content: React.FC<{ content: string; suggestions: string[] }> = ({
             Apply
           </button>
         </div>
-      ) : (
-        <div>No suggestions available</div>
       )}
     </div>
   );
@@ -52,8 +50,10 @@ const ModalAI: React.FC<ModalAIProps> = ({ contentType, onClose }) => {
         suggestions.push(`Suggestion ${i + 1}`);
       }
       setSuggestions(suggestions);
-    } else {
+    } else if (contentType === "Analyze") {
       setContent("Analyze content");
+    } else {
+      setContent("Analytics content");
     }
 
     const timer = setTimeout(() => {

@@ -8,6 +8,7 @@ import { AiOutlineDelete } from "react-icons/ai";
 import * as taskService from "../../services/TaskServices.ts";
 import TimerPopup from "./TimerPopup.tsx";
 import { toast } from "react-toastify";
+import { PiTimer } from "react-icons/pi";
 
 interface TaskCardProps extends React.HTMLAttributes<HTMLDivElement> {
   task: Task;
@@ -66,12 +67,19 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, ...props }) => {
     <div {...props} className="bg-white shadow rounded-lg p-4 mb-4 relative">
       <div className="flex justify-between items-center">
         <h4 className="text-lg font-semibold">{task.title}</h4>
-        <span
-          className={`text-sm px-2 py-1 rounded ${
-            taskPriority[TaskPriority[task.priority]]
-          }`}>
-          {TaskPriority[task.priority]}
-        </span>
+        <div className="flex gap-2">
+          <button
+            onClick={handleTimerClick}
+            className="text-blue-500 bg-blue-100 hover:bg-blue-300 p-1 rounded">
+            <PiTimer />
+          </button>
+          <div
+            className={`text-sm px-2 py-1 rounded ${
+              taskPriority[TaskPriority[task.priority]]
+            }`}>
+            {TaskPriority[task.priority]}
+          </div>
+        </div>
       </div>
       <hr className="my-2" />
       <p className="text-sm text-gray-600">
@@ -87,18 +95,11 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, ...props }) => {
       </p>
       <div className="flex justify-between items-center mt-4 text-sm text-gray-500">
         <div>Due: {task?.end?.toLocaleString() ?? "Not set"}</div>
-        <div className="flex space-x-2">
-          <button
-            onClick={handleTimerClick}
-            className="text-blue-500 bg-blue-100 hover:bg-blue-300 p-1 rounded">
-            Start Timer
-          </button>
-          <button
-            onClick={handleDeleteClick}
-            className="text-red-500 bg-red-100 hover:bg-red-300 p-1 rounded">
-            <AiOutlineDelete />
-          </button>
-        </div>
+        <button
+          onClick={handleDeleteClick}
+          className="text-red-500 bg-red-100 hover:bg-red-300 p-1 rounded">
+          <AiOutlineDelete />
+        </button>
       </div>
       {showTimer && (
         <div onClick={(e) => e.stopPropagation()}>

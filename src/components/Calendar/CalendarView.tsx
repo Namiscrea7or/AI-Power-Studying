@@ -119,7 +119,8 @@ const CalendarView = () => {
   };
 
   return (
-    <div className="p-4">
+    <div>
+      <h1 className="text-4xl font-bold mb-4">Calendar</h1>
       <FullCalendar
         plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
         initialView="dayGridMonth"
