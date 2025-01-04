@@ -7,11 +7,13 @@ import { useTaskContext, TaskStatus } from "../../Context/TaskContext.tsx";
 import * as taskService from "../../services/TaskServices.ts";
 import { EventContentArg, EventClickArg } from "@fullcalendar/core";
 import { toast } from "react-toastify";
+import TimerPopup from "../Tasks/TimerPopup.tsx";
 
 const CalendarView = () => {
   const { tasks, setTasks } = useTaskContext();
   const [selectedEvent, setSelectedEvent] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showTimer, setShowTimer] = useState(false);
 
   function formatDateToLocalDatetime(date: Date) {
     const year = date.getFullYear();
@@ -103,6 +105,17 @@ const CalendarView = () => {
 
   const closeModal = () => {
     setIsModalOpen(false);
+    setShowTimer(false);
+  };
+
+  const handleStartTimerClick = () => {
+    setShowTimer(true);
+  };
+
+  const updateTask = (updatedTask: any) => {
+    setTasks((tasks) =>
+      tasks.map((t) => (t.id === updatedTask.id ? updatedTask : t))
+    );
   };
 
   return (
@@ -148,12 +161,27 @@ const CalendarView = () => {
             </p>
             <div className="text-right mt-4">
               <button
+                onClick={handleStartTimerClick}
+                className="bg-blue-500 text-white px-3 py-1 rounded-md mr-2">
+                Start Timer
+              </button>
+              <button
                 onClick={closeModal}
                 className="bg-gray-200 hover:bg-gray-300 px-3 py-1 rounded-md">
                 Close
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {showTimer && selectedEvent && (
+        <div onClick={(e) => e.stopPropagation()}>
+          <TimerPopup
+            task={selectedEvent.extendedProps}
+            onClose={() => setShowTimer(false)}
+            updateTask={updateTask}
+          />
         </div>
       )}
     </div>

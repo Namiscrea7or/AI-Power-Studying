@@ -8,6 +8,7 @@ export interface Task {
   status: TaskStatus;
   start: Date;
   end: Date;
+  progressTime: number;
 }
 
 export enum TaskPriority {
