@@ -35,6 +35,21 @@ const TimerPopup: React.FC<TimerPopupProps> = ({ task, onClose, updateTask }) =>
     }
   }, [timer, isWork, breakTime, workTime]);
 
+  const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+    if (timer) {
+      event.preventDefault();
+      event.returnValue = ""; // Browser new version prevent custom message
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [timer]);
+
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
     const secs = seconds % 60;
