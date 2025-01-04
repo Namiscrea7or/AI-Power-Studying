@@ -1,5 +1,5 @@
 import React from "react";
-import Info from "./Info.jsx";
+import Info from "./Info.tsx";
 import ChartContainer from "./ChartContainer.tsx";
 import HoverAIButton from "../AI/ButtonAI.tsx";
 

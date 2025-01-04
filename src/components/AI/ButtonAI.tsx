@@ -3,6 +3,7 @@ import { PiSparkle, PiMagicWandLight } from "react-icons/pi";
 import { TbAnalyze } from "react-icons/tb";
 import ModalAI from "./ModalAI.tsx";
 import { MdOutlineFeedback } from "react-icons/md";
+import { AIContentType } from "./Interfaces.tsx";
 
 const ButtonTasksContent = ({ onAnalyze, onSuggestion }) => {
   return (
@@ -38,20 +39,21 @@ const HoverAIButton = ({ isAnalytics = false }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalContent, setModalContent] = useState("Analyze");
+  const [modalContent, setModalContent] = useState<AIContentType | undefined>();
+
   const handleAnalyze = () => {
     setIsModalOpen(true);
-    setModalContent("Analyze");
+    setModalContent(AIContentType.Analyze);
   };
 
   const handleSuggestion = () => {
     setIsModalOpen(true);
-    setModalContent("Suggestions");
+    setModalContent(AIContentType.Suggestions);
   };
 
   const handleAnalytics = () => {
     setIsModalOpen(true);
-    setModalContent("Analytics");
+    setModalContent(AIContentType.Analytics);
   };
 
   return (
