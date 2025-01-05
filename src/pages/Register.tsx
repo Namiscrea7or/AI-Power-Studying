@@ -1,8 +1,13 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { auth, googleProvider, storage } from "../firebase/firebase.config";
-import { createUserWithEmailAndPassword, signInWithPopup } from "firebase/auth";
+import {
+  browserLocalPersistence,
+  createUserWithEmailAndPassword,
+  setPersistence,
+  signInWithPopup,
+} from "firebase/auth";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { getFirestore, doc, setDoc } from "firebase/firestore";
 import { toast } from "react-toastify";
@@ -19,6 +24,10 @@ type RegisterFormInputs = {
 
 const Register: React.FC = () => {
   const navigate = useNavigate();
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, [inputRef]);
 
   const {
     register,
@@ -38,6 +47,7 @@ const Register: React.FC = () => {
         return;
       }
 
+      await setPersistence(auth, browserLocalPersistence);
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         data.email,
@@ -76,9 +86,9 @@ const Register: React.FC = () => {
 
   const handleGoogleSignUp = async () => {
     try {
+      await setPersistence(auth, browserLocalPersistence);
       const result = await signInWithPopup(auth, googleProvider);
       const user = result.user;
-
       const userRef = doc(db, "users", user.uid);
       await setDoc(userRef, {
         username: user.displayName || "NewUser",
@@ -110,6 +120,7 @@ const Register: React.FC = () => {
               type="text"
               id="username"
               {...register("username", { required: "Username is required" })}
+              ref={inputRef}
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
             />
             {errors.username && (

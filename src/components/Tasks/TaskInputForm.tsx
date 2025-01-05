@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Task, TaskPriority, TaskStatus } from "../../Context/TaskContext.tsx";
 import { toast } from "react-toastify";
 
@@ -13,6 +13,11 @@ const TaskInputForm: React.FC<TaskInputFormProps> = ({
   onSubmit,
   onCancel,
 }) => {
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, [inputRef]);
+
   const [title, setTitle] = useState<string>(task?.title ?? "");
   const [priority, setPriority] = useState<TaskPriority>(
     task?.priority ?? TaskPriority.Low
@@ -51,6 +56,7 @@ const TaskInputForm: React.FC<TaskInputFormProps> = ({
       start,
       end,
       status,
+      progressTime: 0,
     };
 
     try {
@@ -93,6 +99,7 @@ const TaskInputForm: React.FC<TaskInputFormProps> = ({
               type="text"
               className="w-full px-3 py-2 border rounded"
               value={title}
+              ref={inputRef}
               onChange={(e) => setTitle(e.target.value)}
               required
             />

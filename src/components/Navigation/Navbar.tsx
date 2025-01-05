@@ -1,9 +1,23 @@
-import { getAuth, signOut } from "firebase/auth";
-import React, { useState } from "react";
+import { getAuth, onAuthStateChanged, signOut, User } from "firebase/auth";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 const Navbar: React.FC = () => {
   const auth = getAuth();
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  useEffect(() => {
+    // Listen for authentication state changes
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setCurrentUser(user); // User is authenticated
+      } else {
+        setCurrentUser(null); // User is not authenticated
+      }
+    });
+
+    // Cleanup on unmount
+    return () => unsubscribe();
+  }, [auth]);
   const [isOpen, setIsOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const navigate = useNavigate();
@@ -50,7 +64,7 @@ const Navbar: React.FC = () => {
 
         {/* Links for Desktop */}
         <div className="hidden md:flex space-x-6 items-center">
-          {!auth.currentUser ? (
+          {!currentUser ? (
             <>
               <Link to="/signin" className="text-gray-700 hover:text-blue-600">
                 Sign In
@@ -102,7 +116,7 @@ const Navbar: React.FC = () => {
       {/* Dropdown Menu for Mobile */}
       {isOpen && (
         <div className="md:hidden bg-white border-t border-gray-200">
-          {!auth.currentUser ? (
+          {!currentUser ? (
             <>
               <Link
                 to="/signin"

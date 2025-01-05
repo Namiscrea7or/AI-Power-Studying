@@ -1,7 +1,12 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
+import {
+  browserLocalPersistence,
+  setPersistence,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+} from "firebase/auth";
 import { auth, googleProvider } from "../firebase/firebase.config";
 import { toast } from "react-toastify";
 
@@ -12,7 +17,11 @@ type SignInFormInputs = {
 };
 
 const Login: React.FC = () => {
-  const inputRef = useRef(null);
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, [inputRef]);
+
   const navigate = useNavigate();
   const {
     register,
@@ -23,6 +32,7 @@ const Login: React.FC = () => {
   // Form submission handler
   const onSubmit: SubmitHandler<SignInFormInputs> = async (data) => {
     try {
+      await setPersistence(auth, browserLocalPersistence);
       await signInWithEmailAndPassword(auth, data.email, data.password);
       navigate("/main");
     } catch (error: any) {
@@ -37,6 +47,7 @@ const Login: React.FC = () => {
 
   const handleGoogleSignIn = async () => {
     try {
+      await setPersistence(auth, browserLocalPersistence);
       await signInWithPopup(auth, googleProvider);
       navigate("/main");
     } catch (error) {
