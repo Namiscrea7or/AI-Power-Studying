@@ -2,7 +2,6 @@ import axios from "axios";
 import { Task, TaskPriority, TaskStatus } from "../Context/TaskContext.tsx";
 import { Serializer } from "jsonapi-serializer";
 import {auth} from "../firebase/firebase.config.js"
-import { getIdToken } from "firebase/auth";
 import { TaskAnalysis } from "../components/AI/Interfaces.tsx";
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:3000/api";
@@ -69,7 +68,7 @@ export const getTasks = async (): Promise<Task[]> => {
       throw new Error();
     }
     
-    token = await getIdToken(user, false);
+    token = await user.getIdToken(false);
     const response = await axios.get(`${API_BASE_URL}/studyTasks`, {
       headers: {
         Authorization: `Bearer ${token}`
@@ -90,7 +89,7 @@ export const getTask = async (id: number): Promise<Task | null> => {
       throw new Error();
     }
     
-    token = await getIdToken(user, false);
+    token = await user.getIdToken(false);
     const response = await axios.get(`${API_BASE_URL}/studyTasks/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`
@@ -112,7 +111,7 @@ export const createTask = async (task: Task): Promise<Task> => {
       throw new Error();
     }
     
-    token = await getIdToken(user, false);
+    token = await user.getIdToken(false);
     // Serialize task
     const dbtask = toDBTask(task);
     const serializedTask = TaskSerializer.serialize(dbtask);
@@ -144,7 +143,7 @@ export const updateTask = async (task: Task): Promise<boolean> => {
       throw new Error();
     }
     
-    token = await getIdToken(user, false);
+    token = await user.getIdToken(false);
 
     const dbtask = toDBTask(task);
     const serializedTask = TaskSerializer.serialize(dbtask);
@@ -171,7 +170,7 @@ export const deleteTask = async (id: number): Promise<void> => {
       throw new Error();
     }
     
-    token = await getIdToken(user, false);
+    token = await user.getIdToken(false);
 
     await axios.delete(`${API_BASE_URL}/studyTasks/${id}`, {
       headers: {
@@ -201,7 +200,7 @@ export const getSuggestions = async (): Promise<TaskAnalysis> => {
       throw new Error();
     }
     
-    token = await getIdToken(user, false);
+    token = await user.getIdToken(false);
     const response = await axios.get(`${API_BASE_URL}/studyTasks/schedule-suggestion`, {
       headers: {
         Authorization: `Bearer ${token}`

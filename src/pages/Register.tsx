@@ -5,7 +5,6 @@ import { auth, googleProvider, storage } from "../firebase/firebase.config";
 import { createUserWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { getFirestore, doc, setDoc } from "firebase/firestore";
-import Cookies from "js-cookie";
 import { toast } from "react-toastify";
 
 const db = getFirestore();
@@ -56,14 +55,6 @@ const Register: React.FC = () => {
         photoURL = await getDownloadURL(storageRef);
       }
 
-      const idToken = await userCredential.user.getIdToken(true);
-
-      Cookies.set("auth_token", idToken, {
-        expires: 1, // 1 day
-        secure: true, // Only for HTTPS
-        sameSite: "strict",
-      });
-
       const userRef = doc(db, "users", userCredential.user.uid);
       await setDoc(userRef, {
         username: data.username,
@@ -87,14 +78,6 @@ const Register: React.FC = () => {
     try {
       const result = await signInWithPopup(auth, googleProvider);
       const user = result.user;
-
-      const idToken = await user.getIdToken(true);
-
-      Cookies.set("auth_token", idToken, {
-        expires: 1, // 1 day
-        secure: true,
-        sameSite: "strict",
-      });
 
       const userRef = doc(db, "users", user.uid);
       await setDoc(userRef, {

@@ -4,15 +4,15 @@ import CalendarView from "../components/Calendar/CalendarView.tsx";
 import TaskView from "../components/TaskView/TaskView.tsx";
 import Analytics from "../components/Analytics/Analytics.tsx";
 import { TaskProvider } from "../Context/TaskContext.tsx";
-import { getAuth } from "firebase/auth";
 import { Navigate } from "react-router-dom";
 import HoverAIButton from "../components/AI/ButtonAI.tsx";
+import { auth } from "../firebase/firebase.config.js";
 
 const MainPage: React.FC = () => {
   const [activeView, setActiveView] = useState<string>("tasks");
 
-  const auth = getAuth();
-  if (!auth.currentUser) {
+  const user = auth.currentUser;
+  if (!user) {
     return <Navigate to={"/signin"} replace />;
   }
 

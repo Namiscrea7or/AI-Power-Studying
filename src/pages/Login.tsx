@@ -1,8 +1,7 @@
-import React from "react";
+import React, { useRef } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
-import Cookies from "js-cookie";
 import { auth, googleProvider } from "../firebase/firebase.config";
 import { toast } from "react-toastify";
 
@@ -13,6 +12,7 @@ type SignInFormInputs = {
 };
 
 const Login: React.FC = () => {
+  const inputRef = useRef(null);
   const navigate = useNavigate();
   const {
     register,
@@ -23,22 +23,7 @@ const Login: React.FC = () => {
   // Form submission handler
   const onSubmit: SubmitHandler<SignInFormInputs> = async (data) => {
     try {
-      const userCredential = await signInWithEmailAndPassword(
-        auth,
-        data.email,
-        data.password
-      );
-      const user = userCredential.user;
-
-      // Get firebase IDToken
-      const idToken = await user.getIdToken(/* forceRefresh */ true);
-
-      Cookies.set("auth_token", idToken, {
-        expires: 1, // 1 day
-        secure: true,
-        sameSite: "strict",
-      });
-
+      await signInWithEmailAndPassword(auth, data.email, data.password);
       navigate("/main");
     } catch (error: any) {
       toast.error(
@@ -52,18 +37,7 @@ const Login: React.FC = () => {
 
   const handleGoogleSignIn = async () => {
     try {
-      const result = await signInWithPopup(auth, googleProvider);
-      const user = result.user;
-
-      const idToken = await user.getIdToken(/* forceRefresh */ true);
-
-      // Store token in cookie
-      Cookies.set("auth_token", idToken, {
-        expires: 1, // 1 day
-        secure: true, // Only for HTTPS
-        sameSite: "strict",
-      });
-
+      await signInWithPopup(auth, googleProvider);
       navigate("/main");
     } catch (error) {
       alert(`Google Sign-In failed: ${error.message}`);
@@ -93,6 +67,7 @@ const Login: React.FC = () => {
                   message: "Enter a valid email address",
                 },
               })}
+              ref={inputRef}
               className={`mt-1 block w-full px-3 py-2 border ${
                 errors.email ? "border-red-500" : "border-gray-300"
               } rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm`}
