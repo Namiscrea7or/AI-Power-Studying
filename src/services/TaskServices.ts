@@ -2,7 +2,7 @@ import axios from "axios";
 import { Task, TaskPriority, TaskStatus } from "../Context/TaskContext.tsx";
 import { Serializer } from "jsonapi-serializer";
 import {auth} from "../firebase/firebase.config.js"
-import { TaskAnalysis } from "../components/AI/Interfaces.tsx";
+import { TaskAnalysis, TaskSuggestion } from "../components/AI/Interfaces.tsx";
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:3000/api";
 
@@ -33,7 +33,7 @@ const deserializeTasks = (jsonData: any): Task[] => {
   }));
 };
 
-function toDBTask(task: Task): DBTask {
+function taskToDBTask(task: Task): DBTask {
   const dbtask: DBTask = {
     id: task.id === -1 ? undefined : task.id,
     description: task.description,
@@ -46,6 +46,7 @@ function toDBTask(task: Task): DBTask {
 
   return dbtask;
 }
+
 const deserializeTask = (jsonData: any): Task => {
     const task : any = {
       id: parseInt(jsonData.id, 10),
@@ -113,7 +114,7 @@ export const createTask = async (task: Task): Promise<Task> => {
     
     token = await user.getIdToken(false);
     // Serialize task
-    const dbtask = toDBTask(task);
+    const dbtask = taskToDBTask(task);
     const serializedTask = TaskSerializer.serialize(dbtask);
 
     // Gửi request
@@ -135,6 +136,47 @@ export const createTask = async (task: Task): Promise<Task> => {
   }
 };
 
+export interface AiTaskUpdate {
+  id: number;
+  priorityLevel?: TaskPriority;
+  startDate?: Date;
+  dueDate?: Date;
+}
+
+function suggestionToTask(suggestion: TaskSuggestion): AiTaskUpdate {
+  const dbtask: AiTaskUpdate = {
+    id: suggestion.taskId ,
+    dueDate: suggestion.newEnd,
+    startDate: suggestion.newStart,
+    priorityLevel: suggestion.newPriority,
+  }
+
+  return dbtask;
+}
+
+export const updateTaskAI = async (suggestion: TaskSuggestion): Promise<void> => {
+  try {
+    let token = "";
+    const user = auth.currentUser;
+    if (!user) {
+      throw new Error();
+    }
+    
+    token = await user.getIdToken(false);
+    
+    const updatedTask = suggestionToTask(suggestion)
+    await axios.patch(`${API_BASE_URL}/studyTasks/${updatedTask.id}`, JSON.stringify(updatedTask), {
+      headers: {
+        "Accept": "application/vnd.api+json",
+        "Content-Type": "application/vnd.api+json",
+        Authorization: `Bearer ${token}`
+      }
+    });
+  } catch (error) {
+    throw error
+  }
+};
+
 export const updateTask = async (task: Task): Promise<boolean> => {
   try {
     let token = "";
@@ -145,7 +187,7 @@ export const updateTask = async (task: Task): Promise<boolean> => {
     
     token = await user.getIdToken(false);
 
-    const dbtask = toDBTask(task);
+    const dbtask = taskToDBTask(task);
     const serializedTask = TaskSerializer.serialize(dbtask);
     
     await axios.patch(`${API_BASE_URL}/studyTasks/${task.id}`, JSON.stringify(serializedTask), {

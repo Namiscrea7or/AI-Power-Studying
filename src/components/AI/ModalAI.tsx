@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { AIContentType, TaskSuggestion } from "./Interfaces.tsx";
 import { TaskPriority } from "../../Context/TaskContext.tsx";
 import { IoIosArrowRoundForward } from "react-icons/io";
-import { getSuggestions } from "../../services/TaskServices.ts";
+import { getSuggestions, updateTaskAI } from "../../services/TaskServices.ts";
 import { toast } from "react-toastify";
 
 interface ModalAIProps {
@@ -82,6 +82,30 @@ const SuggestionItem: React.FC<SuggestionItemProps> = ({
 };
 
 const Content: React.FC<ContentProps> = ({ content, suggestions }) => {
+  const handleSuggestions = async () => {
+    await suggestions.forEach(async (suggestion) => {
+      try {
+        await updateTaskAI(suggestion);
+      } catch (err) {
+        toast.error(
+          <div>
+            <label className="font-bold">
+              Update {suggestion.taskTitle} Failed
+            </label>
+            <p> Something gone wrong!</p>
+          </div>
+        );
+      }
+    });
+
+    toast.success(
+      <div>
+        <label className="font-bold">Suggestions Applied</label>
+        <p> AI agent has successfully optimized your tasks!</p>
+      </div>
+    );
+  };
+
   return (
     <div className="flex-grow h-full flex flex-col overflow-y-auto">
       <div className="pb-4">
@@ -98,7 +122,9 @@ const Content: React.FC<ContentProps> = ({ content, suggestions }) => {
               <SuggestionItem key={index} suggestion={suggestion} />
             ))}
           </div>
-          <button className="text-white p-2 rounded border bg-blue-500 hover:bg-blue-700">
+          <button
+            onClick={handleSuggestions}
+            className="text-white p-2 rounded border bg-blue-500 hover:bg-blue-700">
             Apply
           </button>
         </div>

@@ -181,6 +181,7 @@ const TaskView = () => {
       try {
         const fetchedTasks = await taskService.getTasks();
         setTasks(fetchedTasks);
+        console.log(fetchedTasks);
       } catch (err) {
         toast.error(
           <div>

@@ -6,12 +6,11 @@ const Navbar: React.FC = () => {
   const auth = getAuth();
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   useEffect(() => {
-    // Listen for authentication state changes
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        setCurrentUser(user); // User is authenticated
+        setCurrentUser(user);
       } else {
-        setCurrentUser(null); // User is not authenticated
+        setCurrentUser(null);
       }
     });
 

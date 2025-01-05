@@ -21,12 +21,9 @@ export default function HomePage() {
               </div>
               <div className="space-x-4">
                 <button
-                  onClick={() => navigate("/signin")}
+                  onClick={() => navigate("/main")}
                   className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700">
                   Get Started
-                </button>
-                <button className="px-4 py-2 rounded border text-blue-600 border-blue-600 hover:bg-blue-100">
-                  Learn More
                 </button>
               </div>
             </div>
