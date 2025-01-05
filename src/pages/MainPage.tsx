@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import SideMenu from "../components/Navigation/SideMenu.tsx";
 import CalendarView from "../components/Calendar/CalendarView.tsx";
 import TaskView from "../components/TaskView/TaskView.tsx";
+import Analytics from "../components/Analytics/Analytics.tsx";
 import { TaskProvider } from "../Context/TaskContext.tsx";
 import { getAuth } from "firebase/auth";
 import { Navigate } from "react-router-dom";
@@ -17,7 +18,7 @@ const MainPage: React.FC = () => {
   const views: { [key: string]: JSX.Element } = {
     tasks: <TaskView />,
     calendar: <CalendarView />,
-    // analytics: <Analytics />,
+    analytics: <Analytics />,
     // settings: <Settings />,
   };
 

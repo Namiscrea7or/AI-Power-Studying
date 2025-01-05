@@ -1,6 +1,7 @@
 import axios from "axios";
 import { Task, TaskPriority, TaskStatus } from "../Context/TaskContext.tsx";
 import { Serializer } from "jsonapi-serializer";
+import { mockTasks } from "./MockData.ts";
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:3000/api";
 
@@ -64,7 +65,7 @@ export const getTasks = async (): Promise<Task[]> => {
     return deserializeTasks(response.data);
   } catch (error) {
     console.error("Error fetching tasks:", error);
-    return [];
+    return mockTasks;
   }
 };
 

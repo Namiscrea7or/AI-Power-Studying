@@ -47,6 +47,7 @@ const TaskInputForm: React.FC<TaskInputFormProps> = ({
       title,
       priority,
       description,
+      progressTime: task?.progressTime ?? 0,
       start,
       end,
       status,

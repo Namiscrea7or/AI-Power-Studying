@@ -8,6 +8,7 @@ export interface Task {
   status: TaskStatus;
   start: Date;
   end: Date;
+  progressTime: number;
 }
 
 export enum TaskPriority {
@@ -34,33 +35,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [tasks, setTasks] = useState<Task[]>([
-    {
-      id: 1,
-      title: "HEHE",
-      description: "hehe",
-      priority: TaskPriority.Medium,
-      status: TaskStatus["OnGoing"],
-      start: new Date("2024-12-11T09:00"),
-      end: new Date("2024-12-11T15:00"),
-    },
-    {
-      id: 2,
-      title: "Task 2",
-      description: "t2",
-      priority: TaskPriority.High,
-      status: TaskStatus.Pending,
-      start: new Date("2024-12-13T06:00"),
-      end: new Date("2024-12-14T20:00"),
-    },
-    {
-      id: 3,
-      title: "High Task",
-      description: "high vl",
-      priority: TaskPriority.High,
-      status: TaskStatus.Completed,
-      start: new Date("2024-12-11T08:00"),
-      end: new Date("2024-12-11T20:00"),
-    },
+  
   ]);
 
   return (
