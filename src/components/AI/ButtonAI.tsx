@@ -1,26 +1,17 @@
 import React, { useState } from "react";
 import { PiSparkle, PiMagicWandLight } from "react-icons/pi";
-import { TbAnalyze } from "react-icons/tb";
 import ModalAI from "./ModalAI.tsx";
 import { MdOutlineFeedback } from "react-icons/md";
 import { AIContentType } from "./Interfaces.tsx";
 
-const ButtonTasksContent = ({ onAnalyze, onSuggestion }) => {
+const ButtonTasksContent = ({ onSuggestion }) => {
   return (
-    <>
-      <button
-        onClick={onAnalyze}
-        className="flex items-center gap-2 p-4 rounded-full bg-blue-400 text-white shadow-lg hover:bg-blue-700 transition-all">
-        <TbAnalyze />
-        Analyze
-      </button>
-      <button
-        onClick={onSuggestion}
-        className="flex items-center gap-2 p-4 rounded-full bg-blue-400 text-white shadow-lg hover:bg-blue-700 transition-all">
-        <PiMagicWandLight />
-        Suggestions
-      </button>
-    </>
+    <button
+      onClick={onSuggestion}
+      className="flex items-center gap-2 p-4 rounded-full bg-blue-400 text-white shadow-lg hover:bg-blue-700 transition-all">
+      <PiMagicWandLight />
+      Suggestions
+    </button>
   );
 };
 
@@ -41,11 +32,6 @@ const HoverAIButton = ({ isAnalytics = false }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState<AIContentType | undefined>();
 
-  const handleAnalyze = () => {
-    setIsModalOpen(true);
-    setModalContent(AIContentType.Analyze);
-  };
-
   const handleSuggestion = () => {
     setIsModalOpen(true);
     setModalContent(AIContentType.Suggestions);
@@ -65,10 +51,7 @@ const HoverAIButton = ({ isAnalytics = false }) => {
         (isAnalytics ? (
           <ButtonAnalyticsContent onAnalytics={handleAnalytics} />
         ) : (
-          <ButtonTasksContent
-            onAnalyze={handleAnalyze}
-            onSuggestion={handleSuggestion}
-          />
+          <ButtonTasksContent onSuggestion={handleSuggestion} />
         ))}
 
       <button

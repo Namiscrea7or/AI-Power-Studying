@@ -103,16 +103,12 @@ export default function HomePage() {
           © 2024 PowerStudy. All rights reserved.
         </p>
         <nav className="sm:ml-auto flex gap-4 sm:gap-6">
-          <a
-            className="text-xs hover:underline underline-offset-4 text-blue-600"
-            href="#">
+          <div className="text-xs hover:underline underline-offset-4 text-blue-600">
             Terms of Service
-          </a>
-          <a
-            className="text-xs hover:underline underline-offset-4 text-blue-600"
-            href="#">
+          </div>
+          <div className="text-xs hover:underline underline-offset-4 text-blue-600">
             Privacy
-          </a>
+          </div>
         </nav>
       </footer>
     </div>

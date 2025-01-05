@@ -3,6 +3,8 @@ import React, { useState, useEffect } from "react";
 import { AIContentType, TaskSuggestion } from "./Interfaces.tsx";
 import { TaskPriority } from "../../Context/TaskContext.tsx";
 import { IoIosArrowRoundForward } from "react-icons/io";
+import { getSuggestions } from "../../services/TaskServices.ts";
+import { toast } from "react-toastify";
 
 interface ModalAIProps {
   contentType: AIContentType | undefined;
@@ -122,19 +124,32 @@ const ModalAI: React.FC<ModalAIProps> = ({ contentType, onClose }) => {
   const [content, setContent] = useState<string>("");
 
   useEffect(() => {
-    if (contentType === AIContentType.Suggestions) {
-      setContent("Suggestions content");
-    } else if (contentType === AIContentType.Analyze) {
-      setContent("Analyze content");
-    } else {
-      setContent("Analytics content");
-    }
+    const getData = async () => {
+      try {
+        if (contentType === AIContentType.Suggestions) {
+          const taskAnalysis = await getSuggestions();
+          setContent(taskAnalysis.content);
+          setSuggestions(taskAnalysis.suggestions);
+        } else {
+          setContent("Analytics content");
+        }
+      } catch (err) {
+        toast.error(
+          <div>
+            <label className="font-bold">Get Suggestions Failed</label>
+            <p> Please try again later!</p>
+          </div>
+        );
+      }
 
-    const timer = setTimeout(() => {
-      setContentLoaded(true);
-    }, 300);
+      const timer = setTimeout(() => {
+        setContentLoaded(true);
+      }, 300);
 
-    return () => clearTimeout(timer);
+      return () => clearTimeout(timer);
+    };
+
+    getData();
   }, [contentType]);
 
   return (

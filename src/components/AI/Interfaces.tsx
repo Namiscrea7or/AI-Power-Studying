@@ -22,7 +22,6 @@ interface TaskAnalytics {
 
 enum AIContentType {
   Suggestions,
-  Analyze,
   Analytics,
 }
 

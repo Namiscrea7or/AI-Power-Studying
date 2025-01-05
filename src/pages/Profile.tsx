@@ -50,9 +50,6 @@ const Profile: React.FC = () => {
 
         {/* Action Buttons */}
         <div className="mt-8 flex justify-center space-x-4">
-          <button className="px-6 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 focus:outline-none">
-            Edit Profile
-          </button>
           <button
             className="px-6 py-2 bg-red-600 text-white rounded-lg shadow hover:bg-red-700 focus:outline-none"
             onClick={() => {

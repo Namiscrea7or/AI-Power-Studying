@@ -1,7 +1,9 @@
 import axios from "axios";
 import { Task, TaskPriority, TaskStatus } from "../Context/TaskContext.tsx";
 import { Serializer } from "jsonapi-serializer";
-import { mockTasks } from "./MockData.ts";
+import {auth} from "../firebase/firebase.config.js"
+import { getIdToken } from "firebase/auth";
+import { TaskAnalysis } from "../components/AI/Interfaces.tsx";
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:3000/api";
 
@@ -61,7 +63,19 @@ const deserializeTask = (jsonData: any): Task => {
 
 export const getTasks = async (): Promise<Task[]> => {
   try {
-    const response = await axios.get(`${API_BASE_URL}`);
+    let token = "";
+    const user = auth.currentUser;
+    if (!user) {
+      throw new Error();
+    }
+    
+    token = await getIdToken(user, false);
+    const response = await axios.get(`${API_BASE_URL}/studyTasks`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
     return deserializeTasks(response.data);
   } catch (error) {
     throw error;
@@ -70,7 +84,19 @@ export const getTasks = async (): Promise<Task[]> => {
 
 export const getTask = async (id: number): Promise<Task | null> => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/${id}`);
+    let token = "";
+    const user = auth.currentUser;
+    if (!user) {
+      throw new Error();
+    }
+    
+    token = await getIdToken(user, false);
+    const response = await axios.get(`${API_BASE_URL}/studyTasks/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
     return deserializeTask(response.data);
   } catch (error) {
     console.error("Error fetching task:", error);
@@ -80,18 +106,26 @@ export const getTask = async (id: number): Promise<Task | null> => {
 
 export const createTask = async (task: Task): Promise<Task> => {
   try {
+    let token = "";
+    const user = auth.currentUser;
+    if (!user) {
+      throw new Error();
+    }
+    
+    token = await getIdToken(user, false);
     // Serialize task
     const dbtask = toDBTask(task);
     const serializedTask = TaskSerializer.serialize(dbtask);
 
     // Gửi request
     const response = await axios.post(
-      API_BASE_URL, 
+      `${API_BASE_URL}/studyTasks`, 
       JSON.stringify(serializedTask), 
       {
         headers: {
           "Accept": "application/vnd.api+json",
           "Content-Type": "application/vnd.api+json",
+          Authorization: `Bearer ${token}`
         }
     });
 
@@ -104,13 +138,22 @@ export const createTask = async (task: Task): Promise<Task> => {
 
 export const updateTask = async (task: Task): Promise<boolean> => {
   try {
+    let token = "";
+    const user = auth.currentUser;
+    if (!user) {
+      throw new Error();
+    }
+    
+    token = await getIdToken(user, false);
+
     const dbtask = toDBTask(task);
     const serializedTask = TaskSerializer.serialize(dbtask);
     
-    await axios.patch(`${API_BASE_URL}/${task.id}`, JSON.stringify(serializedTask), {
+    await axios.patch(`${API_BASE_URL}/studyTasks/${task.id}`, JSON.stringify(serializedTask), {
       headers: {
         "Accept": "application/vnd.api+json",
         "Content-Type": "application/vnd.api+json",
+        Authorization: `Bearer ${token}`
       }
     });
     return true
@@ -122,10 +165,19 @@ export const updateTask = async (task: Task): Promise<boolean> => {
 
 export const deleteTask = async (id: number): Promise<void> => {
   try {
-    await axios.delete(`${API_BASE_URL}/${id}`, {
+    let token = "";
+    const user = auth.currentUser;
+    if (!user) {
+      throw new Error();
+    }
+    
+    token = await getIdToken(user, false);
+
+    await axios.delete(`${API_BASE_URL}/studyTasks/${id}`, {
       headers: {
         "Accept": "*/*",
         "Content-Type": "application/vnd.api+json",
+        Authorization: `Bearer ${token}`
       }
     });
   } catch (error) {
@@ -133,3 +185,32 @@ export const deleteTask = async (id: number): Promise<void> => {
     throw error;
   }
 };
+
+const JsonToTaskAnalysis = (jsonData: any) : TaskAnalysis => {
+  return {
+    content: jsonData.content,
+    suggestions: jsonData.suggestions
+  }
+}
+
+export const getSuggestions = async (): Promise<TaskAnalysis> => {
+  try {
+    let token = "";
+    const user = auth.currentUser;
+    if (!user) {
+      throw new Error();
+    }
+    
+    token = await getIdToken(user, false);
+    const response = await axios.get(`${API_BASE_URL}/studyTasks/schedule-suggestion`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    console.log(response.data)
+    return JsonToTaskAnalysis(response.data);
+  } catch (error) {
+    throw error;
+  }
+}

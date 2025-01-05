@@ -11,7 +11,6 @@ import {
 import TaskInputForm from "../Tasks/TaskInputForm.tsx";
 import * as taskService from "../../services/TaskServices.ts";
 import { toast } from "react-toastify";
-import HoverAIButton from "../AI/ButtonAI.tsx";
 
 const Header = ({ setIsAddingTask, setSort, setFilter, setSearch }) => {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -177,8 +176,6 @@ const TaskView = () => {
     ((a: Task, b: Task) => number) | undefined
   >(undefined);
 
-  const [loading, setLoading] = useState(true);
-
   useEffect(() => {
     const fetchTasksFromAPI = async () => {
       try {
@@ -191,26 +188,22 @@ const TaskView = () => {
             <p> Please try again later!</p>
           </div>
         );
-      } finally {
-        setLoading(false);
       }
     };
 
     fetchTasksFromAPI();
-  }, []);
+  }, [setTasks]);
 
   const addTask = async (task: Task): Promise<boolean> => {
     try {
-      setLoading(true);
       const newTask = await taskService.createTask(task);
       setTasks([...tasks, newTask]);
       setIsAddingTask(false);
-      setLoading(false);
       return true;
     } catch (error) {
       toast.error(
         <div>
-          <label className="font-bold">Fetch Task Failed</label>
+          <label className="font-bold">Load Tasks Failed</label>
           <p> Please try again later!</p>
         </div>
       );
@@ -235,12 +228,8 @@ const TaskView = () => {
     return filteredTasks;
   };
 
-  if (loading) {
-    return <div>Loading Tasks...</div>;
-  }
-
   return (
-    <div className="relative">
+    <div>
       <Header
         setIsAddingTask={() => setIsAddingTask(true)}
         setSearch={setSearch}
@@ -273,7 +262,6 @@ const TaskView = () => {
           color={Color.Red}
         />
       </div>
-      <HoverAIButton />
     </div>
   );
 };
