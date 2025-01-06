@@ -287,8 +287,6 @@ const deserializeTimers = (jsonData: any): TaskTimer[] => {
     id: parseInt(item.id, 10),
     studyTaskId: parseInt(item.attributes.studyTaskId, 10),
     duration: item.attributes.duration,
-    startTime: item.attributes.startTime ? new Date(item.attributes.startTime) : null,
-    endTime: item.attributes.endTime ? new Date(item.attributes.endTime) : null,
     timerType: item.attributes.timerType,
     timerState: item.attributes.timerState,
   }));
@@ -298,8 +296,6 @@ const timerToDBTimer = (timer: TaskTimer): any => ({
   id: timer.id,
   studyTaskId: timer.studyTaskId,
   duration: timer.duration,
-  startTime: timer.startTime,
-  endTime: timer.endTime,
   timerType: timer.timerType,
   timerState: timer.timerState,
 });
@@ -332,14 +328,32 @@ export const createTimerSession = async (timerSession: TaskTimer): Promise<TaskT
     let token = "";
     const user = auth.currentUser;
     if (!user) {
-      throw new Error();
+      throw new Error("User is not authenticated");
     }
 
     token = await user.getIdToken(false);
 
     const dbTimer = timerToDBTimer(timerSession);
-    const serializedTimer = TimerSerializer.serialize(dbTimer);
-    console.log("this is timer data", serializedTimer);
+    const serializedTimer = {
+      data: {
+        type: "timerSessions",
+        attributes: {
+          duration: dbTimer.duration,
+          timerType: dbTimer.timerType,
+          timerState: dbTimer.timerState,
+        },
+        relationships: {
+          studyTask: {
+            data: {
+              type: "studyTasks",
+              id: dbTimer.studyTaskId.toString(),
+            },
+          },
+        },
+      },
+    };
+
+    console.log("Serialized Timer:", serializedTimer);
 
     const response = await axios.post(
       `${API_BASE_URL}/timerSessions`,
@@ -353,11 +367,65 @@ export const createTimerSession = async (timerSession: TaskTimer): Promise<TaskT
       }
     );
 
-    console.log("this is response", response.data.data);
+    console.log("Response Data:", response.data);
 
     return deserializeTimers({ data: response.data.data })[0];
   } catch (error) {
     console.error("Error creating timer session:", error);
+    throw error;
+  }
+};
+
+export const updateTimerSession = async (timerSession: TaskTimer): Promise<TaskTimer> => {
+  try {
+    let token = "";
+    const user = auth.currentUser;
+    if (!user) {
+      throw new Error("User is not authenticated");
+    }
+
+    token = await user.getIdToken(false);
+
+    const dbTimer = timerToDBTimer(timerSession);
+    const serializedTimer = {
+      data: {
+        type: "timerSessions",
+        id: dbTimer.id.toString(),
+        attributes: {
+          duration: dbTimer.duration,
+          timerType: dbTimer.timerType,
+          timerState: dbTimer.timerState,
+        },
+        relationships: {
+          studyTask: {
+            data: {
+              type: "studyTasks",
+              id: dbTimer.studyTaskId.toString(),
+            },
+          },
+        },
+      },
+    };
+
+    console.log("Serialized Timer:", serializedTimer);
+
+    const response = await axios.patch(
+      `${API_BASE_URL}/timerSessions/${dbTimer.id}`,
+      JSON.stringify(serializedTimer),
+      {
+        headers: {
+          "Accept": "application/vnd.api+json",
+          "Content-Type": "application/vnd.api+json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    console.log("Response Data:", response.data);
+
+    return deserializeTimers({ data: response.data.data })[0];
+  } catch (error) {
+    console.error("Error updating timer session:", error);
     throw error;
   }
 };
