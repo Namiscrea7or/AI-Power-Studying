@@ -1,8 +1,7 @@
 import React from "react";
-import { useTaskContext, TaskStatus } from "../../Context/TaskContext.tsx";
 import {
-  BarChart,
-  Bar,
+  LineChart,
+  Line,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -14,53 +13,49 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-const ChartContainer = () => {
-  const { tasks } = useTaskContext();
+const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
-  // Calculate total time spent and total estimated time
-  const totalTimeSpent = tasks.reduce(
-    (acc, task) => acc + task.progressTime,
-    0
-  );
-  const totalEstimatedTime = tasks.reduce(
-    (acc, task) => acc + (task.end.getTime() - task.start.getTime()) / 1000,
-    0
-  );
+interface ChartContainerProps {
+  data: {
+    dailyTimeSpent: { date: string; timeSpent: number }[];
+    taskStatusSummary: {
+      todo: number;
+      inProgress: number;
+      completed: number;
+      expired: number;
+    };
+  };
+}
 
-  // Calculate total time spent daily
-  const dailyTimeSpent = tasks.reduce((acc, task) => {
-    const date = task.start.toLocaleDateString();
-    acc[date] = (acc[date] || 0) + task.progressTime;
-    return acc;
-  }, {} as Record<string, number>);
+const mockData = {
+  dailyTimeSpent: [
+    { date: "2023-01-01", timeSpent: 2 },
+    { date: "2023-01-02", timeSpent: 3 },
+    { date: "2023-01-03", timeSpent: 1.5 },
+    { date: "2023-01-04", timeSpent: 4 },
+    { date: "2023-01-05", timeSpent: 2.5 },
+  ],
+  taskStatusSummary: {
+    todo: 5,
+    inProgress: 3,
+    completed: 8,
+    expired: 1,
+  },
+};
 
-  const dailyTimeSpentData = Object.keys(dailyTimeSpent).map((date) => ({
-    date,
-    timeSpent: dailyTimeSpent[date] / 3600, // Convert to hours
-  }));
-
-  // Calculate total tasks of each status
-  const taskStatusCount = tasks.reduce((acc, task) => {
-    acc[task.status] = (acc[task.status] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
-
-  const taskStatusData = Object.keys(taskStatusCount).map((status) => ({
+const ChartContainer: React.FC<ChartContainerProps> = ({ data }) => {
+  const { dailyTimeSpent, taskStatusSummary } = mockData;
+  const taskStatusData = Object.keys(taskStatusSummary).map((status) => ({
     status,
-    count: taskStatusCount[status],
+    count: taskStatusSummary[status],
   }));
-
-  const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
   return (
-    <div className="mb-8 flex gap-4">
-      <div className="p-4 rounded-xl border shadow">
-        <h3 className="text-xl font-semibold mb-2">
-          Total Tasks of Each Status
-        </h3>
+    <div className="mb-8 flex flex-col lg:flex-row gap-4">
+      <div className="p-4 rounded-xl border shadow flex-grow">
+        <h3 className="text-xl font-semibold mb-2">Total Tasks of Each Status</h3>
         <div className="w-full">
-          {/* Wrap the chart in ResponsiveContainer */}
-          <ResponsiveContainer minWidth={400} width="100%" height={350}>
+          <ResponsiveContainer width="100%" height={350}>
             <PieChart>
               <Pie
                 outerRadius={80}
@@ -73,7 +68,8 @@ const ChartContainer = () => {
                   `${name}: ${(percent * 100).toFixed(0)}%`
                 }
                 fill="#8884d8"
-                dataKey="count">
+                dataKey="count"
+              >
                 {taskStatusData.map((entry, index) => (
                   <Cell
                     key={`cell-${index}`}
@@ -89,7 +85,16 @@ const ChartContainer = () => {
       <div className="p-4 rounded-xl border shadow flex-grow">
         <h3 className="text-xl font-semibold mb-2">User Progress</h3>
         <div className="w-full">
-          {/* Wrap the chart in ResponsiveContainer */}
+          <ResponsiveContainer width="100%" height={350}>
+            <LineChart data={dailyTimeSpent}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="date" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Line type="monotone" dataKey="timeSpent" stroke="#8884d8" />
+            </LineChart>
+          </ResponsiveContainer>
         </div>
       </div>
     </div>

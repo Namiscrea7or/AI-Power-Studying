@@ -1,7 +1,7 @@
 import axios from "axios";
-import { Task, TaskPriority, TaskStatus } from "../Context/TaskContext.tsx";
+import { Task, TaskPriority, TaskStatus, TaskTimer } from "../Context/TaskContext.tsx";
 import { Serializer } from "jsonapi-serializer";
-import {auth} from "../firebase/firebase.config.js"
+import { auth } from "../firebase/firebase.config.js"
 import { TaskAnalysis, TaskSuggestion } from "../components/AI/Interfaces.tsx";
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:3000/api";
@@ -48,14 +48,14 @@ function taskToDBTask(task: Task): DBTask {
 }
 
 const deserializeTask = (jsonData: any): Task => {
-    const task : any = {
-      id: parseInt(jsonData.id, 10),
-      title: jsonData.attributes.title,
-      description: jsonData.attributes.description,
-      priority: jsonData.attributes.priorityLevel,
-      status: jsonData.attributes.status,
-      start: jsonData.attributes.startDate ? new Date(jsonData.attributes.startDate) : null,
-      end: jsonData.attributes.dueDate ? new Date(jsonData.attributes.dueDate) : null,
+  const task: any = {
+    id: parseInt(jsonData.id, 10),
+    title: jsonData.attributes.title,
+    description: jsonData.attributes.description,
+    priority: jsonData.attributes.priorityLevel,
+    status: jsonData.attributes.status,
+    start: jsonData.attributes.startDate ? new Date(jsonData.attributes.startDate) : null,
+    end: jsonData.attributes.dueDate ? new Date(jsonData.attributes.dueDate) : null,
   }
 
   return task;
@@ -68,7 +68,7 @@ export const getTasks = async (): Promise<Task[]> => {
     if (!user) {
       throw new Error();
     }
-    
+
     token = await user.getIdToken(false);
     const response = await axios.get(`${API_BASE_URL}/studyTasks`, {
       headers: {
@@ -89,7 +89,7 @@ export const getTask = async (id: number): Promise<Task | null> => {
     if (!user) {
       throw new Error();
     }
-    
+
     token = await user.getIdToken(false);
     const response = await axios.get(`${API_BASE_URL}/studyTasks/${id}`, {
       headers: {
@@ -110,23 +110,22 @@ export const createTask = async (task: Task): Promise<Task> => {
     if (!user) {
       throw new Error();
     }
-    
+
     token = await user.getIdToken(false);
     // Serialize task
     const dbtask = taskToDBTask(task);
     const serializedTask = TaskSerializer.serialize(dbtask);
 
-    // Gửi request
     const response = await axios.post(
-      `${API_BASE_URL}/studyTasks`, 
-      JSON.stringify(serializedTask), 
+      `${API_BASE_URL}/studyTasks`,
+      JSON.stringify(serializedTask),
       {
         headers: {
           "Accept": "application/vnd.api+json",
           "Content-Type": "application/vnd.api+json",
           Authorization: `Bearer ${token}`
         }
-    });
+      });
 
     return deserializeTask(response.data.data);
   } catch (error) {
@@ -157,9 +156,9 @@ export const updateTaskAI = async (suggestion: TaskSuggestion): Promise<void> =>
     if (!user) {
       throw new Error();
     }
-    
+
     token = await user.getIdToken(false);
-    
+
     const updatedTask = suggestionToTask(suggestion)
     const serializedTask = TaskSerializer.serialize(updatedTask);
     console.log(serializedTask);
@@ -182,12 +181,12 @@ export const updateTask = async (task: Task): Promise<boolean> => {
     if (!user) {
       throw new Error();
     }
-    
+
     token = await user.getIdToken(false);
 
     const dbtask = taskToDBTask(task);
     const serializedTask = TaskSerializer.serialize(dbtask);
-    
+
     await axios.patch(`${API_BASE_URL}/studyTasks/${task.id}`, JSON.stringify(serializedTask), {
       headers: {
         "Accept": "application/vnd.api+json",
@@ -208,7 +207,7 @@ export const deleteTask = async (id: number): Promise<void> => {
     if (!user) {
       throw new Error();
     }
-    
+
     token = await user.getIdToken(false);
 
     await axios.delete(`${API_BASE_URL}/studyTasks/${id}`, {
@@ -223,7 +222,7 @@ export const deleteTask = async (id: number): Promise<void> => {
   }
 };
 
-const JsonToTaskAnalysis = (jsonData: any) : TaskAnalysis => {
+const JsonToTaskAnalysis = (jsonData: any): TaskAnalysis => {
   return {
     content: jsonData.content,
     suggestions: jsonData.suggestions.map((s) : TaskSuggestion => {
@@ -248,7 +247,7 @@ export const getSuggestions = async (): Promise<TaskAnalysis> => {
     if (!user) {
       throw new Error();
     }
-    
+
     token = await user.getIdToken(false);
     const response = await axios.get(`${API_BASE_URL}/studyTasks/schedule-suggestion`, {
       headers: {
@@ -261,3 +260,110 @@ export const getSuggestions = async (): Promise<TaskAnalysis> => {
     throw error;
   }
 }
+
+export const getAnalyticsSummary = async (): Promise<any> => {
+  try {
+    let token = "";
+    const user = auth.currentUser;
+    if (!user) {
+      throw new Error();
+    }
+
+    token = await user.getIdToken(false);
+    const response = await axios.get(`${API_BASE_URL}/analytics/summary`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    console.log(response.data);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+const TimerSerializer = new Serializer("timerSessions", {
+  attributes: ["studyTaskId", "duration", "startTime", "endTime", "timerType", "timerState"],
+  keyForAttribute: "camelCase",
+});
+
+const deserializeTimers = (jsonData: any): TaskTimer[] => {
+  return jsonData.data.map((item: any) => ({
+    id: parseInt(item.id, 10),
+    studyTaskId: parseInt(item.attributes.studyTaskId, 10),
+    duration: item.attributes.duration,
+    startTime: item.attributes.startTime ? new Date(item.attributes.startTime) : null,
+    endTime: item.attributes.endTime ? new Date(item.attributes.endTime) : null,
+    timerType: item.attributes.timerType,
+    timerState: item.attributes.timerState,
+  }));
+};
+
+const timerToDBTimer = (timer: TaskTimer): any => ({
+  id: timer.id,
+  studyTaskId: timer.studyTaskId,
+  duration: timer.duration,
+  startTime: timer.startTime,
+  endTime: timer.endTime,
+  timerType: timer.timerType,
+  timerState: timer.timerState,
+});
+
+export const getTimerSessions = async (studyTaskId: number): Promise<TaskTimer[]> => {
+  try {
+    let token = "";
+    const user = auth.currentUser;
+    if (!user) {
+      throw new Error("User is not authenticated");
+    }
+
+    token = await user.getIdToken(false);
+
+    const response = await axios.get(`${API_BASE_URL}/timerSessions/${studyTaskId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    return deserializeTimers(response.data);
+  } catch (error) {
+    console.error("Error fetching timer sessions:", error);
+    throw error;
+  }
+};
+
+export const createTimerSession = async (timerSession: TaskTimer): Promise<TaskTimer> => {
+  try {
+    let token = "";
+    const user = auth.currentUser;
+    if (!user) {
+      throw new Error();
+    }
+
+    token = await user.getIdToken(false);
+
+    const dbTimer = timerToDBTimer(timerSession);
+    const serializedTimer = TimerSerializer.serialize(dbTimer);
+    console.log("this is timer data", serializedTimer);
+
+    const response = await axios.post(
+      `${API_BASE_URL}/timerSessions`,
+      JSON.stringify(serializedTimer),
+      {
+        headers: {
+          "Accept": "application/vnd.api+json",
+          "Content-Type": "application/vnd.api+json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    console.log("this is response", response.data.data);
+
+    return deserializeTimers({ data: response.data.data })[0];
+  } catch (error) {
+    console.error("Error creating timer session:", error);
+    throw error;
+  }
+};
