@@ -255,3 +255,25 @@ export const getSuggestions = async (): Promise<TaskAnalysis> => {
     throw error;
   }
 }
+
+export const getAnalyticsSummary = async (): Promise<any> => {
+  try {
+    let token = "";
+    const user = auth.currentUser;
+    if (!user) {
+      throw new Error();
+    }
+
+    token = await user.getIdToken(false);
+    const response = await axios.get(`${API_BASE_URL}/analytics/summary`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    console.log(response.data);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
