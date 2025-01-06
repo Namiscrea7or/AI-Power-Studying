@@ -35,6 +35,22 @@ const TimerPopup: React.FC<TimerPopupProps> = ({ task, onClose, updateTask }) =>
     }
   }, [timer, isWork, breakTime, workTime]);
 
+  const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+    if (timer) {
+      event.preventDefault();
+      event.returnValue = ""; // Required for Chrome to trigger the confirmation dialog
+      handleClose(); // Automatically close the session
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [timer]);
+
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
     const secs = seconds % 60;
