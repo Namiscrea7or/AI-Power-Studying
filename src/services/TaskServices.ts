@@ -2,7 +2,7 @@ import axios from "axios";
 import { Task, TaskPriority, TaskStatus, TaskTimer } from "../Context/TaskContext.tsx";
 import { Serializer } from "jsonapi-serializer";
 import { auth } from "../firebase/firebase.config.js"
-import { TaskAnalysis, TaskSuggestion } from "../components/AI/Interfaces.tsx";
+import { TaskAnalysis, TaskAnalytics, TaskSuggestion } from "../components/AI/Interfaces.tsx";
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:3000/api";
 
@@ -256,6 +256,30 @@ export const getSuggestions = async (): Promise<TaskAnalysis> => {
     });
 
     return JsonToTaskAnalysis(response.data)
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const getAnalyticsFeedback = async (): Promise<TaskAnalytics> => {
+  try {
+    let token = "";
+    const user = auth.currentUser;
+    if (!user) {
+      throw new Error();
+    }
+
+    token = await user.getIdToken(false);
+    const response = await axios.get(`${API_BASE_URL}/studyTasks/ai-feedback`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    console.log(response.data)
+    return {
+      content: response.data
+    }
   } catch (error) {
     throw error;
   }
