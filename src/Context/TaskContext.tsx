@@ -13,8 +13,8 @@ export interface Task {
 export interface TaskTimer {
   id: number;
   duration: number;
-  timerType: 1 | 0;
-  timerState: 1 | 0;
+  timerType: number;
+  timerState: number;
   studyTaskId: number;
 }
 

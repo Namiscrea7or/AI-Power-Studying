@@ -291,20 +291,22 @@ const TimerSerializer = new Serializer("timerSessions", {
 const deserializeTimers = (jsonData: any): TaskTimer[] => {
   return jsonData.data.map((item: any) => ({
     id: parseInt(item.id, 10),
-    studyTaskId: parseInt(item.attributes.studyTaskId, 10),
-    duration: item.attributes.duration,
-    timerType: item.attributes.timerType,
-    timerState: item.attributes.timerState,
+    studyTaskId: parseInt(item.studyTaskId, 10),
+    duration: item.duration,
+    timerType: item.timerType,
+    timerState: item.timerState,
   }));
 };
 
-const timerToDBTimer = (timer: TaskTimer): any => ({
-  id: timer.id,
-  studyTaskId: timer.studyTaskId,
-  duration: timer.duration,
-  timerType: timer.timerType,
-  timerState: timer.timerState,
-});
+const deserializeTimer = (item: any): TaskTimer => {
+  return {
+    id: parseInt(item.id, 10),
+    studyTaskId: item.studyTaskId,
+    duration: item.duration,
+    timerType: item.timerType,
+    timerState: item.timerState,
+  };
+};
 
 export const getTimerSessions = async (studyTaskId: number): Promise<TaskTimer[]> => {
   try {
@@ -339,20 +341,19 @@ export const createTimerSession = async (timerSession: TaskTimer): Promise<TaskT
 
     token = await user.getIdToken(false);
 
-    const dbTimer = timerToDBTimer(timerSession);
     const serializedTimer = {
       data: {
         type: "timerSessions",
         attributes: {
-          duration: dbTimer.duration,
-          timerType: dbTimer.timerType,
-          timerState: dbTimer.timerState,
+          duration: timerSession.duration,
+          timerType: timerSession.timerType,
+          timerState: timerSession.timerState,
         },
         relationships: {
           studyTask: {
             data: {
               type: "studyTasks",
-              id: dbTimer.studyTaskId.toString(),
+              id: timerSession.studyTaskId,
             },
           },
         },
@@ -375,7 +376,7 @@ export const createTimerSession = async (timerSession: TaskTimer): Promise<TaskT
 
     console.log("Response Data:", response.data);
 
-    return deserializeTimers({ data: response.data.data })[0];
+    return deserializeTimer({ data: response.data.data })[0];
   } catch (error) {
     console.error("Error creating timer session:", error);
     throw error;
@@ -392,21 +393,20 @@ export const updateTimerSession = async (timerSession: TaskTimer): Promise<TaskT
 
     token = await user.getIdToken(false);
 
-    const dbTimer = timerToDBTimer(timerSession);
     const serializedTimer = {
       data: {
         type: "timerSessions",
-        id: dbTimer.id.toString(),
+        id: timerSession.id,
         attributes: {
-          duration: dbTimer.duration,
-          timerType: dbTimer.timerType,
-          timerState: dbTimer.timerState,
+          duration: timerSession.duration,
+          timerType: timerSession.timerType,
+          timerState: timerSession.timerState,
         },
         relationships: {
           studyTask: {
             data: {
               type: "studyTasks",
-              id: dbTimer.studyTaskId.toString(),
+              id: timerSession.studyTaskId,
             },
           },
         },
@@ -416,7 +416,7 @@ export const updateTimerSession = async (timerSession: TaskTimer): Promise<TaskT
     console.log("Serialized Timer:", serializedTimer);
 
     const response = await axios.patch(
-      `${API_BASE_URL}/timerSessions/${dbTimer.id}`,
+      `${API_BASE_URL}/timerSessions/${timerSession.id}`,
       JSON.stringify(serializedTimer),
       {
         headers: {
@@ -429,7 +429,7 @@ export const updateTimerSession = async (timerSession: TaskTimer): Promise<TaskT
 
     console.log("Response Data:", response.data);
 
-    return deserializeTimers({ data: response.data.data })[0];
+    return deserializeTimer({ data: response.data.data })[0];
   } catch (error) {
     console.error("Error updating timer session:", error);
     throw error;

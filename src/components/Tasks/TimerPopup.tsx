@@ -112,13 +112,17 @@ const TimerPopup: React.FC<TimerPopupProps> = ({
       setIsSessionRunning(true);
 
       try {
-        const newSession = await createTimerSession({
+        const sessionData = {
           id: 0,
           duration: 0,
           timerType: 0,
           timerState: 0,
           studyTaskId: task.id,
-        });
+        };
+
+        const newSession = await createTimerSession(sessionData);
+        console.log("New session created:", newSession);
+
         setCurrentSessionId(newSession.id);
         localStorage.setItem(
           "runningSession",
@@ -145,25 +149,20 @@ const TimerPopup: React.FC<TimerPopupProps> = ({
   };
 
   const handleClose = async () => {
-    handlePause();
-    updateTask({
-      ...task,
-    });
-
     if (currentSessionId) {
       try {
         await updateTimerSession({
           id: currentSessionId,
           duration: workTime - timeLeft,
-          timerType: 1,
+          timerType: 0,
           timerState: 1,
           studyTaskId: task.id,
         });
         alert("Session ended successfully!");
-        localStorage.removeItem("runningSession");
       } catch (error) {
         console.error("Error updating timer session:", error);
       }
+      localStorage.removeItem("runningSession");
     }
 
     onClose();
