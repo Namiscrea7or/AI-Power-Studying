@@ -42,7 +42,7 @@ const TimerPopup: React.FC<TimerPopupProps> = ({ task, onClose, updateTask }) =>
     const checkRunningSession = async () => {
       try {
         const sessions = await getTimerSessions(task.id);
-        const runningSession = sessions.find((session: any) => session.timerState === "Started");
+        const runningSession = sessions.find((session: any) => session.timerState === 0);
         if (runningSession) {
           setIsSessionRunning(true);
           setCurrentSessionId(runningSession.id);
@@ -92,8 +92,8 @@ const TimerPopup: React.FC<TimerPopupProps> = ({ task, onClose, updateTask }) =>
           startTime: new Date().toISOString(),
           endTime: "",
           duration: 0,
-          timerType: 1,
-          timerState: 1,
+          timerType: 0,
+          timerState: 0,
           studyTaskId: task.id,
         });
         setCurrentSessionId(newSession.id);
@@ -127,8 +127,8 @@ const TimerPopup: React.FC<TimerPopupProps> = ({ task, onClose, updateTask }) =>
           startTime: new Date(Date.now() - (workTime - timeLeft) * 1000).toISOString(),
           endTime: new Date().toISOString(),
           duration: workTime - timeLeft,
-          timerType: 0,
-          timerState: 0,
+          timerType: 1,
+          timerState: 1,
           studyTaskId: task.id,
         });
       } catch (error) {
