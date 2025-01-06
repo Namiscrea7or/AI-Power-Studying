@@ -24,6 +24,7 @@ const TimerPopup: React.FC<TimerPopupProps> = ({
   const [timer, setTimer] = useState<NodeJS.Timeout | null>(null);
   const [showNotification, setShowNotification] = useState(false);
   const [isSessionRunning, setIsSessionRunning] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
   const [currentSessionId, setCurrentSessionId] = useState<number | null>(null);
 
   useEffect(() => {
@@ -87,7 +88,7 @@ const TimerPopup: React.FC<TimerPopupProps> = ({
   };
 
   const handleStart = async () => {
-    if (isSessionRunning) {
+    if (isSessionRunning && !isPaused) {
       alert(
         "A session is already running. Please close the other session first."
       );
@@ -119,6 +120,7 @@ const TimerPopup: React.FC<TimerPopupProps> = ({
     if (timer) {
       clearInterval(timer);
       setTimer(null);
+      setIsPaused(true);
     }
   };
 
@@ -147,6 +149,7 @@ const TimerPopup: React.FC<TimerPopupProps> = ({
           timerState: 1,
           studyTaskId: task.id,
         });
+        alert("Session ended successfully!");
       } catch (error) {
         console.error("Error updating timer session:", error);
       }
