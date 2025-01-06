@@ -11,6 +11,16 @@ export interface Task {
   progressTime: number;
 }
 
+export interface TaskTimer {
+  id: number;
+  startTime: string;
+  endTime: string;
+  duration: number;
+  timerType: 1 | 0;
+  timerState: 1 | 0;
+  studyTaskId: number;
+}
+
 export enum TaskPriority {
   "High",
   "Medium",

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Task } from "../../Context/TaskContext.tsx";
+import { createTimerSession, getTimerSessions } from "../../services/TaskServices.ts";
 
 interface TimerPopupProps {
   task: Task;
@@ -14,6 +15,7 @@ const TimerPopup: React.FC<TimerPopupProps> = ({ task, onClose, updateTask }) =>
   const [timeLeft, setTimeLeft] = useState(workTime);
   const [timer, setTimer] = useState<NodeJS.Timeout | null>(null);
   const [showNotification, setShowNotification] = useState(false);
+  const [isSessionRunning, setIsSessionRunning] = useState(false);
 
   useEffect(() => {
     setTimeLeft(workTime);
@@ -34,6 +36,20 @@ const TimerPopup: React.FC<TimerPopupProps> = ({ task, onClose, updateTask }) =>
       return () => clearInterval(interval);
     }
   }, [timer, isWork, breakTime, workTime]);
+
+  useEffect(() => {
+    const checkRunningSession = async () => {
+      try {
+        const sessions = await getTimerSessions(task.id);
+        const runningSession = sessions.find((session: any) => session.timerState === "Started");
+        setIsSessionRunning(!!runningSession);
+      } catch (error) {
+        console.error("Error checking running session:", error);
+      }
+    };
+
+    checkRunningSession();
+  }, [task.id]);
 
   const handleBeforeUnload = (event: BeforeUnloadEvent) => {
     if (timer) {
@@ -57,9 +73,15 @@ const TimerPopup: React.FC<TimerPopupProps> = ({ task, onClose, updateTask }) =>
     return `${minutes}:${secs < 10 ? "0" : ""}${secs}`;
   };
 
-  const handleStart = () => {
+  const handleStart = async () => {
+    if (isSessionRunning) {
+      alert("A session is already running. Please close the other session first.");
+      return;
+    }
+
     if (!timer) {
       setTimer(setTimeout(() => {}, 0)); // Dummy timeout to trigger useEffect
+      setIsSessionRunning(true);
     }
   };
 
@@ -76,9 +98,24 @@ const TimerPopup: React.FC<TimerPopupProps> = ({ task, onClose, updateTask }) =>
     setIsWork(true);
   };
 
-  const handleClose = () => {
+  const handleClose = async () => {
     handlePause();
     updateTask({ ...task, progressTime: task.progressTime + (workTime - timeLeft) });
+
+    try {
+      await createTimerSession({
+        id: 0,
+        startTime: new Date(Date.now() - (workTime - timeLeft) * 1000).toISOString(),
+        endTime: new Date().toISOString(),
+        duration: workTime - timeLeft,
+        timerType: isWork ? 1 : 0,
+        timerState: 1,
+        studyTaskId: task.id,
+      });
+    } catch (error) {
+      console.error("Error creating timer session:", error);
+    }
+
     onClose();
   };
 
