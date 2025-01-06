@@ -4,6 +4,7 @@ import { AIContentType, TaskSuggestion } from "./Interfaces.tsx";
 import { TaskPriority, useTaskContext } from "../../Context/TaskContext.tsx";
 import { IoIosArrowRoundForward } from "react-icons/io";
 import {
+  getAnalyticsFeedback,
   getSuggestions,
   getTasks,
   updateTaskAI,
@@ -176,7 +177,7 @@ const ModalAI: React.FC<ModalAIProps> = ({ contentType, onClose }) => {
           setContent(taskAnalysis.content);
           setSuggestions(taskAnalysis.suggestions);
         } else {
-          setContent("Analytics content");
+          const taskFeedback = await getAnalyticsFeedback();
         }
       } catch (err) {
         toast.error(

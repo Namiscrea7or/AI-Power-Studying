@@ -35,8 +35,8 @@ const CalendarView = () => {
 
     let newStatus: TaskStatus;
 
-    if (new Date(newStart) < new Date()) {
-      newStatus = TaskStatus.Completed;
+    if (new Date(newStart) <= new Date()) {
+      newStatus = TaskStatus.Expired;
     } else if (
       new Date(newStart) >= new Date(originalTask.start) &&
       new Date(newStart) <= new Date(originalTask.end)

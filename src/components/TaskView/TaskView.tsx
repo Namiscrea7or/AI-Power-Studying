@@ -258,7 +258,7 @@ const TaskView = () => {
         />
         <TaskColumn
           title="Expired"
-          tasks={sortedTasks(TaskStatus.Completed)}
+          tasks={sortedTasks(TaskStatus.Expired)}
           color={Color.Red}
         />
       </div>
