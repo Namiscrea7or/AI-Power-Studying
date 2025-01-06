@@ -7,6 +7,7 @@ import {
   useTaskContext,
   Task,
   TaskStatus,
+  TaskPriority,
 } from "../../Context/TaskContext.tsx";
 import TaskInputForm from "../Tasks/TaskInputForm.tsx";
 import * as taskService from "../../services/TaskServices.ts";
@@ -21,12 +22,7 @@ const Header = ({ setIsAddingTask, setSort, setFilter, setSearch }) => {
     {
       title: "Priority",
       compareFn: () => (a: Task, b: Task) => {
-        const priorityOrder: Record<string, number> = {
-          High: 1,
-          Medium: 2,
-          Low: 3,
-        };
-        return priorityOrder[a.priority] - priorityOrder[b.priority];
+        return a.priority - b.priority;
       },
     },
     {
@@ -42,15 +38,15 @@ const Header = ({ setIsAddingTask, setSort, setFilter, setSearch }) => {
   const filterOptions = [
     {
       title: "High",
-      value: "High",
+      value: TaskPriority.High,
     },
     {
       title: "Medium",
-      value: "Medium",
+      value: TaskPriority.Medium,
     },
     {
       title: "Low",
-      value: "Low",
+      value: TaskPriority.Low,
     },
   ];
 
@@ -217,12 +213,14 @@ const TaskView = () => {
 
   const sortedTasks = (status: TaskStatus) => {
     const filteredTasks = tasks
-      .filter(
-        (t) =>
+      .filter((t) => {
+        return (
           t.status === status &&
-          (!filterOption || t.priority === filterOption) &&
+          ((filterOption !== 0 && !filterOption) ||
+            t.priority === filterOption) &&
           (!search || t.title.toLowerCase().includes(search.toLowerCase()))
-      )
+        );
+      })
       .sort(sortOption || (() => 0));
 
     return filteredTasks;
