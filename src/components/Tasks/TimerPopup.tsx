@@ -66,6 +66,17 @@ const TimerPopup: React.FC<TimerPopupProps> = ({
     checkRunningSession();
   }, [task.id]);
 
+  useEffect(() => {
+    const storedSession = localStorage.getItem("runningSession");
+    if (storedSession) {
+      const session = JSON.parse(storedSession);
+      if (session.taskId === task.id) {
+        setIsSessionRunning(true);
+        setCurrentSessionId(session.id);
+      }
+    }
+  }, [task.id]);
+
   const handleBeforeUnload = (event: BeforeUnloadEvent) => {
     if (timer) {
       event.preventDefault();
@@ -88,7 +99,8 @@ const TimerPopup: React.FC<TimerPopupProps> = ({
   };
 
   const handleStart = async () => {
-    if (isSessionRunning && !isPaused) {
+    const storedSession = localStorage.getItem("runningSession");
+    if (storedSession && !isPaused) {
       alert(
         "A session is already running. Please close the other session first."
       );
@@ -102,14 +114,16 @@ const TimerPopup: React.FC<TimerPopupProps> = ({
       try {
         const newSession = await createTimerSession({
           id: 0,
-          startTime: new Date().toISOString(),
-          endTime: "",
           duration: 0,
           timerType: 0,
           timerState: 0,
           studyTaskId: task.id,
         });
         setCurrentSessionId(newSession.id);
+        localStorage.setItem(
+          "runningSession",
+          JSON.stringify({ id: newSession.id, taskId: task.id })
+        );
       } catch (error) {
         console.error("Error creating timer session:", error);
       }
@@ -140,16 +154,13 @@ const TimerPopup: React.FC<TimerPopupProps> = ({
       try {
         await updateTimerSession({
           id: currentSessionId,
-          startTime: new Date(
-            Date.now() - (workTime - timeLeft) * 1000
-          ).toISOString(),
-          endTime: new Date().toISOString(),
           duration: workTime - timeLeft,
           timerType: 1,
           timerState: 1,
           studyTaskId: task.id,
         });
         alert("Session ended successfully!");
+        localStorage.removeItem("runningSession");
       } catch (error) {
         console.error("Error updating timer session:", error);
       }
