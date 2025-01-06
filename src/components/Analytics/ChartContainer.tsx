@@ -1,8 +1,7 @@
 import React from "react";
-import { useTaskContext, TaskStatus } from "../../Context/TaskContext.tsx";
 import {
-  BarChart,
-  Bar,
+  LineChart,
+  Line,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -14,19 +13,18 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
+// Mock data for tasks
+const tasks = [
+  { id: 1, title: "Task 1", start: new Date("2023-01-01"), progressTime: 3600, status: "Completed" },
+  { id: 2, title: "Task 2", start: new Date("2023-01-02"), progressTime: 7200, status: "In Progress" },
+  { id: 3, title: "Task 3", start: new Date("2023-01-03"), progressTime: 1800, status: "Pending" },
+  { id: 4, title: "Task 4", start: new Date("2023-01-04"), progressTime: 5400, status: "Completed" },
+  { id: 5, title: "Task 5", start: new Date("2023-01-05"), progressTime: 3600, status: "Failed" },
+];
+
+const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
+
 const ChartContainer = () => {
-  const { tasks } = useTaskContext();
-
-  // Calculate total time spent and total estimated time
-  const totalTimeSpent = tasks.reduce(
-    (acc, task) => acc + task.progressTime,
-    0
-  );
-  const totalEstimatedTime = tasks.reduce(
-    (acc, task) => acc + (task.end.getTime() - task.start.getTime()) / 1000,
-    0
-  );
-
   // Calculate total time spent daily
   const dailyTimeSpent = tasks.reduce((acc, task) => {
     const date = task.start.toLocaleDateString();
@@ -50,8 +48,6 @@ const ChartContainer = () => {
     count: taskStatusCount[status],
   }));
 
-  const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
-
   return (
     <div className="mb-8 flex gap-4">
       <div className="p-4 rounded-xl border shadow">
@@ -59,7 +55,6 @@ const ChartContainer = () => {
           Total Tasks of Each Status
         </h3>
         <div className="w-full">
-          {/* Wrap the chart in ResponsiveContainer */}
           <ResponsiveContainer minWidth={400} width="100%" height={350}>
             <PieChart>
               <Pie
@@ -73,7 +68,8 @@ const ChartContainer = () => {
                   `${name}: ${(percent * 100).toFixed(0)}%`
                 }
                 fill="#8884d8"
-                dataKey="count">
+                dataKey="count"
+              >
                 {taskStatusData.map((entry, index) => (
                   <Cell
                     key={`cell-${index}`}
@@ -89,7 +85,16 @@ const ChartContainer = () => {
       <div className="p-4 rounded-xl border shadow flex-grow">
         <h3 className="text-xl font-semibold mb-2">User Progress</h3>
         <div className="w-full">
-          {/* Wrap the chart in ResponsiveContainer */}
+          <ResponsiveContainer minWidth={400} width="100%" height={350}>
+            <LineChart data={dailyTimeSpentData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="date" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Line type="monotone" dataKey="timeSpent" stroke="#8884d8" />
+            </LineChart>
+          </ResponsiveContainer>
         </div>
       </div>
     </div>
