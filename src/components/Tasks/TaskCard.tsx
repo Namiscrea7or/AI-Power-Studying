@@ -20,15 +20,6 @@ const taskPriority = {
   Low: "bg-gray-100 text-gray-700",
 };
 
-const formatTime = (seconds: number) => {
-  const hours = Math.floor(seconds / 3600);
-  const minutes = Math.floor((seconds % 3600) / 60);
-  const secs = seconds % 60;
-  return `${hours}:${minutes < 10 ? "0" : ""}${minutes}:${
-    secs < 10 ? "0" : ""
-  }${secs}`;
-};
-
 const TaskCard: React.FC<TaskCardProps> = ({ task, ...props }) => {
   const { setTasks } = useTaskContext();
   const [showTimer, setShowTimer] = useState(false);
@@ -88,10 +79,6 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, ...props }) => {
       <p className="text-sm text-gray-600 my-2 break-words line-clamp-3">
         <b>Description: </b>
         {task.description}
-      </p>
-      <p className="text-sm text-gray-600 my-2">
-        <b>Progress Time: </b>
-        {formatTime(task.progressTime)}
       </p>
       <div className="flex justify-between items-center mt-4 text-sm text-gray-500">
         <div>Due: {task?.end?.toLocaleString() ?? "Not set"}</div>

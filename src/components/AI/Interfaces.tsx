@@ -3,12 +3,12 @@ import { TaskPriority } from "../../Context/TaskContext";
 interface TaskSuggestion {
   taskId: number;
   taskTitle: string;
-  oldPriority?: TaskPriority;
-  newPriority?: TaskPriority;
-  oldStart?: Date;
-  newStart?: Date;
-  oldEnd?: Date;
-  newEnd?: Date;
+  oldPriority: TaskPriority | null;
+  newPriority: TaskPriority | null;
+  oldStart: Date | null;
+  newStart: Date | null;
+  oldEnd: Date | null;
+  newEnd: Date | null;
 }
 
 interface TaskAnalysis {

@@ -67,7 +67,10 @@ const HoverAIButton = ({ isAnalytics = false }) => {
 
       {isModalOpen && (
         <ModalAI
-          onClose={() => setIsModalOpen(false)}
+          onClose={() => {
+            setIsModalOpen(false);
+            setModalContent(undefined);
+          }}
           contentType={modalContent}
         />
       )}

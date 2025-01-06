@@ -56,7 +56,6 @@ const TaskInputForm: React.FC<TaskInputFormProps> = ({
       start,
       end,
       status,
-      progressTime: 0,
     };
 
     try {

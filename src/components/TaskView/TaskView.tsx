@@ -181,7 +181,6 @@ const TaskView = () => {
       try {
         const fetchedTasks = await taskService.getTasks();
         setTasks(fetchedTasks);
-        console.log(fetchedTasks);
       } catch (err) {
         toast.error(
           <div>
@@ -240,7 +239,7 @@ const TaskView = () => {
       {isAddingTask && (
         <TaskInputForm onSubmit={addTask} onCancel={cancelAddingTask} />
       )}
-      <div className="flex gap-4 lg:flex-row lg:items-start flex-col overflow-x-auto">
+      <div className="flex gap-4 lg:flex-row lg:items-start flex-col">
         <TaskColumn
           title="To Do"
           tasks={sortedTasks(TaskStatus.Pending)}

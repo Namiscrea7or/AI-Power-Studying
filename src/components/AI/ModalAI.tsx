@@ -1,9 +1,13 @@
 import { IoIosClose } from "react-icons/io";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Dispatch } from "react";
 import { AIContentType, TaskSuggestion } from "./Interfaces.tsx";
-import { TaskPriority } from "../../Context/TaskContext.tsx";
+import { TaskPriority, useTaskContext } from "../../Context/TaskContext.tsx";
 import { IoIosArrowRoundForward } from "react-icons/io";
-import { getSuggestions, updateTaskAI } from "../../services/TaskServices.ts";
+import {
+  getSuggestions,
+  getTasks,
+  updateTaskAI,
+} from "../../services/TaskServices.ts";
 import { toast } from "react-toastify";
 
 interface ModalAIProps {
@@ -14,6 +18,7 @@ interface ModalAIProps {
 interface ContentProps {
   content: string;
   suggestions: TaskSuggestion[];
+  setSuggestions: Dispatch<React.SetStateAction<TaskSuggestion[]>>;
 }
 
 interface SuggestionItemProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -35,7 +40,7 @@ const SuggestionItem: React.FC<SuggestionItemProps> = ({
       {...props}
       className="p-2 rounded border border-gray-300 flex flex-col gap-2">
       <div className="font-bold">{suggestion.taskTitle}</div>
-      {suggestion.newPriority != null && suggestion.oldPriority != null && (
+      {suggestion.newPriority != null && suggestion.oldPriority != null ? (
         <div className="flex items-center gap-2">
           <p>Priority: </p>
           <div
@@ -52,22 +57,19 @@ const SuggestionItem: React.FC<SuggestionItemProps> = ({
             {TaskPriority[suggestion.newPriority]}
           </div>
         </div>
-      )}
-      {suggestion.newStart != null && suggestion.oldStart != null && (
+      ) : null}
+      {suggestion.newStart && suggestion.oldStart ? (
         <div className="flex items-center gap-2">
           <div>Start date: </div>
           <div className="text-sm px-2 py-1 rounded bg-gray-100 text-gray-700">
             {suggestion.oldStart.toLocaleString()}
           </div>
           <IoIosArrowRoundForward />
-          <div className="text-sm px-2 py-1 rounded bg-green-100 text-green-700">
-            {suggestion.newStart.toLocaleString()}
-          </div>
         </div>
-      )}
-      {suggestion.newEnd != null && suggestion.oldEnd != null && (
+      ) : null}
+      {suggestion.newEnd && suggestion.oldEnd ? (
         <div className="flex items-center gap-2">
-          <div>Start date: </div>
+          <div>End date: </div>
           <div className="text-sm px-2 py-1 rounded bg-gray-100 text-gray-700">
             {suggestion.oldEnd.toLocaleString()}
           </div>
@@ -76,13 +78,20 @@ const SuggestionItem: React.FC<SuggestionItemProps> = ({
             {suggestion.newEnd.toLocaleString()}
           </div>
         </div>
-      )}
+      ) : null}
     </div>
   );
 };
 
-const Content: React.FC<ContentProps> = ({ content, suggestions }) => {
+const Content: React.FC<ContentProps> = ({
+  content,
+  suggestions,
+  setSuggestions,
+}) => {
+  const [isApply, setIsApply] = useState(false);
+  const { setTasks } = useTaskContext();
   const handleSuggestions = async () => {
+    setIsApply(true);
     await suggestions.forEach(async (suggestion) => {
       try {
         await updateTaskAI(suggestion);
@@ -98,6 +107,10 @@ const Content: React.FC<ContentProps> = ({ content, suggestions }) => {
       }
     });
 
+    await fetchTasksFromAPI();
+    setIsApply(false);
+    setSuggestions([]);
+
     toast.success(
       <div>
         <label className="font-bold">Suggestions Applied</label>
@@ -106,12 +119,26 @@ const Content: React.FC<ContentProps> = ({ content, suggestions }) => {
     );
   };
 
+  const fetchTasksFromAPI = async () => {
+    try {
+      const fetchedTasks = await getTasks();
+      setTasks(fetchedTasks);
+    } catch (err) {
+      toast.error(
+        <div>
+          <label className="font-bold">Fetch Task Failed</label>
+          <p> Please try again later!</p>
+        </div>
+      );
+    }
+  };
+
   return (
     <div className="flex-grow h-full flex flex-col overflow-y-auto">
       <div className="pb-4">
         <h3 className="text-lg font-semibold pb-2">Feedback</h3>
         <p className="break-words p-2 rounded border border-gray-200">
-          {content}
+          {content.length > 0 ? content : "No feedback"}
         </p>
       </div>
       {suggestions.length > 0 ? (
@@ -123,6 +150,7 @@ const Content: React.FC<ContentProps> = ({ content, suggestions }) => {
             ))}
           </div>
           <button
+            disabled={isApply}
             onClick={handleSuggestions}
             className="text-white p-2 rounded border bg-blue-500 hover:bg-blue-700">
             Apply
@@ -137,16 +165,7 @@ const Content: React.FC<ContentProps> = ({ content, suggestions }) => {
 
 const ModalAI: React.FC<ModalAIProps> = ({ contentType, onClose }) => {
   const [isContentLoaded, setContentLoaded] = useState(false);
-  const [suggestions, setSuggestions] = useState<TaskSuggestion[]>([
-    {
-      taskId: 1,
-      taskTitle: "Task 1",
-      oldPriority: TaskPriority.Low,
-      newPriority: TaskPriority.High,
-      oldStart: new Date("2022-01-01"),
-      newStart: new Date("2022-01-15"),
-    },
-  ]);
+  const [suggestions, setSuggestions] = useState<TaskSuggestion[]>([]);
   const [content, setContent] = useState<string>("");
 
   useEffect(() => {
@@ -186,7 +205,7 @@ const ModalAI: React.FC<ModalAIProps> = ({ contentType, onClose }) => {
         className="flex flex-col bg-white h-2/3 overflow-y-auto p-6 rounded-lg shadow-lg w-2/3 lg:w-1/2"
         onClick={(e) => e.stopPropagation()}>
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-bold">AI Modal</h2>
+          <h2 className="text-lg font-bold">AI Assistant</h2>
           <button
             className="text-gray-500 hover:text-gray-700"
             onClick={onClose}>
@@ -196,11 +215,15 @@ const ModalAI: React.FC<ModalAIProps> = ({ contentType, onClose }) => {
         {/* Show loading spinner or placeholder until content is ready */}
         <div className="flex-grow flex items-center justify-center">
           {isContentLoaded ? (
-            <Content content={content} suggestions={suggestions} />
+            <Content
+              content={content}
+              suggestions={suggestions}
+              setSuggestions={setSuggestions}
+            />
           ) : (
             <div className="text-center">
               <div className="loader border-t-blue-500 border-4 w-8 h-8 mx-auto animate-spin rounded-full"></div>
-              <p>Loading...</p>
+              <p>Getting analysis...</p>
             </div>
           )}
         </div>

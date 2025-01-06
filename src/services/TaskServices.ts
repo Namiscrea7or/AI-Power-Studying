@@ -99,7 +99,6 @@ export const getTask = async (id: number): Promise<Task | null> => {
 
     return deserializeTask(response.data);
   } catch (error) {
-    console.error("Error fetching task:", error);
     return null;
   }
 };
@@ -131,7 +130,6 @@ export const createTask = async (task: Task): Promise<Task> => {
 
     return deserializeTask(response.data.data);
   } catch (error) {
-    console.error("Error creating task:", error);
     throw error;
   }
 };
@@ -144,14 +142,12 @@ export interface AiTaskUpdate {
 }
 
 function suggestionToTask(suggestion: TaskSuggestion): AiTaskUpdate {
-  const dbtask: AiTaskUpdate = {
+  return {
     id: suggestion.taskId ,
-    dueDate: suggestion.newEnd,
-    startDate: suggestion.newStart,
-    priorityLevel: suggestion.newPriority,
-  }
-
-  return dbtask;
+    dueDate: suggestion.newEnd ?? undefined,
+    startDate: suggestion.newStart ?? undefined,
+    priorityLevel: suggestion.newPriority ?? undefined,
+  };
 }
 
 export const updateTaskAI = async (suggestion: TaskSuggestion): Promise<void> => {
@@ -165,7 +161,9 @@ export const updateTaskAI = async (suggestion: TaskSuggestion): Promise<void> =>
     token = await user.getIdToken(false);
     
     const updatedTask = suggestionToTask(suggestion)
-    await axios.patch(`${API_BASE_URL}/studyTasks/${updatedTask.id}`, JSON.stringify(updatedTask), {
+    const serializedTask = TaskSerializer.serialize(updatedTask);
+    console.log(serializedTask);
+    await axios.patch(`${API_BASE_URL}/studyTasks/${updatedTask.id}`, JSON.stringify(serializedTask), {
       headers: {
         "Accept": "application/vnd.api+json",
         "Content-Type": "application/vnd.api+json",
@@ -199,7 +197,6 @@ export const updateTask = async (task: Task): Promise<boolean> => {
     });
     return true
   } catch (error) {
-    console.error("Error updating task:", error);
     return false;
   }
 };
@@ -222,7 +219,6 @@ export const deleteTask = async (id: number): Promise<void> => {
       }
     });
   } catch (error) {
-    console.error("Error deleting task:", error);
     throw error;
   }
 };
@@ -230,7 +226,18 @@ export const deleteTask = async (id: number): Promise<void> => {
 const JsonToTaskAnalysis = (jsonData: any) : TaskAnalysis => {
   return {
     content: jsonData.content,
-    suggestions: jsonData.suggestions
+    suggestions: jsonData.suggestions.map((s) : TaskSuggestion => {
+      return {
+        taskId: s.id,
+        taskTitle: s.title,
+        oldEnd: s.oldEnd ? new Date(s.oldEnd) : null,
+        newEnd: s.newEnd ? new Date(s.newEnd) : null,
+        oldPriority: s.oldPriority,
+        newPriority: s.newPriority,
+        oldStart: s.oldStart ? new Date(s.oldStart) : null,
+        newStart: s.newStart ? new Date(s.newStart) : null
+      }
+    })
   }
 }
 
@@ -249,8 +256,7 @@ export const getSuggestions = async (): Promise<TaskAnalysis> => {
       }
     });
 
-    console.log(response.data)
-    return JsonToTaskAnalysis(response.data);
+    return JsonToTaskAnalysis(response.data)
   } catch (error) {
     throw error;
   }
