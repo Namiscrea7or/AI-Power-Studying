@@ -113,7 +113,6 @@ const TimerPopup: React.FC<TimerPopupProps> = ({
     handlePause();
     updateTask({
       ...task,
-      progressTime: task.progressTime + (workTime - timeLeft),
     });
 
     try {
