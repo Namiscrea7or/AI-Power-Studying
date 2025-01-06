@@ -324,11 +324,11 @@ const deserializeTimers = (jsonData: any): TaskTimer[] => {
 
 const deserializeTimer = (item: any): TaskTimer => {
   return {
-    id: parseInt(item.id, 10),
+    id: item.id,
     studyTaskId: item.studyTaskId,
-    duration: item.duration,
-    timerType: item.timerType,
-    timerState: item.timerState,
+    duration: item.attributes.duration,
+    timerType: item.attributes.timerType,
+    timerState: item.attributes.timerState,
   };
 };
 
@@ -377,7 +377,7 @@ export const createTimerSession = async (timerSession: TaskTimer): Promise<TaskT
           studyTask: {
             data: {
               type: "studyTasks",
-              id: timerSession.studyTaskId,
+              id: timerSession.studyTaskId.toString(),
             },
           },
         },
@@ -400,7 +400,7 @@ export const createTimerSession = async (timerSession: TaskTimer): Promise<TaskT
 
     console.log("Response Data:", response.data);
 
-    return deserializeTimer({ data: response.data.data })[0];
+    return deserializeTimer(response.data.data);
   } catch (error) {
     console.error("Error creating timer session:", error);
     throw error;
@@ -422,17 +422,7 @@ export const updateTimerSession = async (timerSession: TaskTimer): Promise<TaskT
         type: "timerSessions",
         id: timerSession.id,
         attributes: {
-          duration: timerSession.duration,
-          timerType: timerSession.timerType,
           timerState: timerSession.timerState,
-        },
-        relationships: {
-          studyTask: {
-            data: {
-              type: "studyTasks",
-              id: timerSession.studyTaskId,
-            },
-          },
         },
       },
     };
@@ -451,9 +441,9 @@ export const updateTimerSession = async (timerSession: TaskTimer): Promise<TaskT
       }
     );
 
-    console.log("Response Data:", response.data);
+    console.log("Response Data:", response.data.data);
 
-    return deserializeTimer({ data: response.data.data })[0];
+    return deserializeTimer(response.data.data);
   } catch (error) {
     console.error("Error updating timer session:", error);
     throw error;

@@ -108,7 +108,7 @@ const TimerPopup: React.FC<TimerPopupProps> = ({
     }
 
     if (!timer) {
-      setTimer(setTimeout(() => {}, 0)); // Dummy timeout to trigger useEffect
+      setTimer(setTimeout(() => { }, 0)); // Dummy timeout to trigger useEffect
       setIsSessionRunning(true);
 
       try {
@@ -120,14 +120,17 @@ const TimerPopup: React.FC<TimerPopupProps> = ({
           studyTaskId: task.id,
         };
 
+        console.log("Creating new session:", sessionData);
         const newSession = await createTimerSession(sessionData);
         console.log("New session created:", newSession);
 
-        setCurrentSessionId(newSession.id);
-        localStorage.setItem(
-          "runningSession",
-          JSON.stringify({ id: newSession.id, taskId: task.id })
-        );
+        if (newSession) {
+          setCurrentSessionId(newSession.id);
+          localStorage.setItem(
+            "runningSession",
+            JSON.stringify({ id: newSession.id, taskId: task.id })
+          );
+        }
       } catch (error) {
         console.error("Error creating timer session:", error);
       }
