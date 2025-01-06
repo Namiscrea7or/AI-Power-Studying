@@ -270,14 +270,15 @@ export const getAnalyticsFeedback = async (): Promise<TaskAnalytics> => {
     }
 
     token = await user.getIdToken(false);
-    const response = await axios.get(`${API_BASE_URL}/studyTasks/schedule-suggestion`, {
+    const response = await axios.get(`${API_BASE_URL}/studyTasks/ai-feedback`, {
       headers: {
         Authorization: `Bearer ${token}`
       }
     });
 
+    console.log(response.data)
     return {
-      content: response.data.content
+      content: response.data
     }
   } catch (error) {
     throw error;

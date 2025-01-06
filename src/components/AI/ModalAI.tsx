@@ -178,6 +178,7 @@ const ModalAI: React.FC<ModalAIProps> = ({ contentType, onClose }) => {
           setSuggestions(taskAnalysis.suggestions);
         } else {
           const taskFeedback = await getAnalyticsFeedback();
+          setContent(taskFeedback.content);
         }
       } catch (err) {
         toast.error(
