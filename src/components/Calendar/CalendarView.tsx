@@ -85,6 +85,8 @@ const CalendarView = () => {
       },
       allDay: false,
     }));
+
+  console.log("formattedEvents", formattedEvents);
   const renderEventContent = (eventInfo: EventContentArg) => {
     const status = eventInfo.event.extendedProps.status;
     let backgroundColorClass = "bg-blue-300";
@@ -99,9 +101,17 @@ const CalendarView = () => {
   };
 
   const handleEventClick = (clickInfo: EventClickArg) => {
-    setSelectedEvent(clickInfo.event);
-    setIsModalOpen(true);
+    const eventId = clickInfo.event.id;
+    const task = tasks.find((t) => String(t.id) === eventId);
+    console.log("task", task);
+    if (task) {
+      setSelectedEvent(task);
+      setIsModalOpen(true);
+    } else {
+      toast.error("Task not found!");
+    }
   };
+
 
   const closeModal = () => {
     setIsModalOpen(false);
@@ -141,25 +151,24 @@ const CalendarView = () => {
           <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm">
             <h2 className="text-xl font-semibold mb-4">Event Details</h2>
             <p className="mb-2">
-              <strong className="font-medium">Title:</strong>{" "}
-              {selectedEvent.title}
+              <strong className="font-medium">Title:</strong> {selectedEvent.title}
             </p>
             <p className="mb-2">
               <strong className="font-medium">Start:</strong>{" "}
-              {formatDateToLocalDatetime(selectedEvent.start)}
+              {formatDateToLocalDatetime(new Date(selectedEvent.start))}
             </p>
             <p className="mb-2">
               <strong className="font-medium">End:</strong>{" "}
-              {formatDateToLocalDatetime(selectedEvent.end)}
+              {formatDateToLocalDatetime(new Date(selectedEvent.end))}
             </p>
             <p className="mb-2">
-              <strong className="font-medium">Status:</strong>{" "}
-              {selectedEvent.extendedProps.status}
+              <strong className="font-medium">Status:</strong> {selectedEvent.status}
             </p>
             <p className="mb-2">
               <strong className="font-medium">Description:</strong>{" "}
-              {selectedEvent.extendedProps.description}
+              {selectedEvent.description}
             </p>
+
             <div className="text-right mt-4">
               <button
                 onClick={handleStartTimerClick}
@@ -179,7 +188,7 @@ const CalendarView = () => {
       {showTimer && selectedEvent && (
         <div onClick={(e) => e.stopPropagation()}>
           <TimerPopup
-            task={selectedEvent.extendedProps}
+            task={selectedEvent}
             onClose={() => setShowTimer(false)}
             updateTask={updateTask}
           />
