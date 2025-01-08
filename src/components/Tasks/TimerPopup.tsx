@@ -108,14 +108,14 @@ const TimerPopup: React.FC<TimerPopupProps> = ({
     }
 
     if (!timer) {
-      setTimer(setTimeout(() => { }, 0)); // Dummy timeout to trigger useEffect
+      setTimer(setTimeout(() => {}, 0)); // Dummy timeout to trigger useEffect
       setIsSessionRunning(true);
 
       try {
         const sessionData = {
           id: 0,
           duration: 0,
-          timerType: 0,
+          timerType: isWork ? 0 : 1, // 0 for work, 1 for break
           timerState: 0,
           studyTaskId: task.id,
         };
@@ -157,7 +157,7 @@ const TimerPopup: React.FC<TimerPopupProps> = ({
         await updateTimerSession({
           id: currentSessionId,
           duration: workTime - timeLeft,
-          timerType: 0,
+          timerType: isWork ? 0 : 1, // 0 for work, 1 for break
           timerState: 1,
           studyTaskId: task.id,
         });
@@ -179,10 +179,11 @@ const TimerPopup: React.FC<TimerPopupProps> = ({
   };
 
   const handleBreak = () => {
+    handlePause();
     setIsWork(false);
     setTimeLeft(breakTime);
     setShowNotification(false);
-    handleStart();
+    setTimer(setTimeout(() => {}, 0)); // Dummy timeout to trigger useEffect
   };
 
   return (
