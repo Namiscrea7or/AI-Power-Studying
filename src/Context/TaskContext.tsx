@@ -25,9 +25,9 @@ export enum TaskPriority {
 }
 
 export enum TaskStatus {
-  "Completed",
-  "OnGoing",
   "Pending",
+  "OnGoing",
+  "Completed",
   "Expired",
 }
 
