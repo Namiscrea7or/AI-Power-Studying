@@ -30,12 +30,12 @@ const Info: React.FC<InfoProps> = ({ data }) => {
   const formatTime = (time: number) => {
     switch (timeFormat) {
       case "minutes":
-        return (time * 60).toFixed(2);
+        return (time * 60).toFixed(0);
       case "seconds":
-        return (time * 3600).toFixed(2);
+        return (time * 3600).toFixed(0);
       case "hours":
       default:
-        return time.toFixed(2);
+        return time.toFixed(0);
     }
   };
 

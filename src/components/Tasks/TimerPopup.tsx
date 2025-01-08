@@ -112,18 +112,25 @@ const TimerPopup: React.FC<TimerPopupProps> = ({
       setIsSessionRunning(true);
 
       try {
-        const newSession = await createTimerSession({
+        const sessionData = {
           id: 0,
           duration: 0,
-          timerType: 0,
+          timerType: isWork ? 0 : 1, // 0 for work, 1 for break
           timerState: 0,
           studyTaskId: task.id,
-        });
-        setCurrentSessionId(newSession.id);
-        localStorage.setItem(
-          "runningSession",
-          JSON.stringify({ id: newSession.id, taskId: task.id })
-        );
+        };
+
+        console.log("Creating new session:", sessionData);
+        const newSession = await createTimerSession(sessionData);
+        console.log("New session created:", newSession);
+
+        if (newSession) {
+          setCurrentSessionId(newSession.id);
+          localStorage.setItem(
+            "runningSession",
+            JSON.stringify({ id: newSession.id, taskId: task.id })
+          );
+        }
       } catch (error) {
         console.error("Error creating timer session:", error);
       }
@@ -145,25 +152,20 @@ const TimerPopup: React.FC<TimerPopupProps> = ({
   };
 
   const handleClose = async () => {
-    handlePause();
-    updateTask({
-      ...task,
-    });
-
     if (currentSessionId) {
       try {
         await updateTimerSession({
           id: currentSessionId,
           duration: workTime - timeLeft,
-          timerType: 1,
+          timerType: isWork ? 0 : 1, // 0 for work, 1 for break
           timerState: 1,
           studyTaskId: task.id,
         });
         alert("Session ended successfully!");
-        localStorage.removeItem("runningSession");
       } catch (error) {
         console.error("Error updating timer session:", error);
       }
+      localStorage.removeItem("runningSession");
     }
 
     onClose();
@@ -177,10 +179,11 @@ const TimerPopup: React.FC<TimerPopupProps> = ({
   };
 
   const handleBreak = () => {
+    handlePause();
     setIsWork(false);
     setTimeLeft(breakTime);
     setShowNotification(false);
-    handleStart();
+    setTimer(setTimeout(() => {}, 0)); // Dummy timeout to trigger useEffect
   };
 
   return (

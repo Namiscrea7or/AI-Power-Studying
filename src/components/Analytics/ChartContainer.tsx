@@ -17,7 +17,6 @@ const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
 interface ChartContainerProps {
   data: {
-    dailyTimeSpent: { date: string; timeSpent: number }[];
     taskStatusSummary: {
       todo: number;
       inProgress: number;
@@ -35,16 +34,11 @@ const mockData = {
     { date: "2023-01-04", timeSpent: 4 },
     { date: "2023-01-05", timeSpent: 2.5 },
   ],
-  taskStatusSummary: {
-    todo: 5,
-    inProgress: 3,
-    completed: 8,
-    expired: 1,
-  },
 };
 
 const ChartContainer: React.FC<ChartContainerProps> = ({ data }) => {
-  const { dailyTimeSpent, taskStatusSummary } = mockData;
+  const { dailyTimeSpent } = mockData;
+  const { taskStatusSummary } = data;
   const taskStatusData = Object.keys(taskStatusSummary).map((status) => ({
     status,
     count: taskStatusSummary[status],
